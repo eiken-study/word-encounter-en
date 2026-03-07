@@ -1,0 +1,2704 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>英検準1級｜単語遭遇カード</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;700&family=Noto+Sans+JP:wght@400;500&family=IBM+Plex+Mono:wght@400;500&display=swap');
+  :root {
+    --bg:#f7f5f0; --paper:#fffffe; --ink:#1c1a18; --ink-mid:#5a5650;
+    --ink-light:#999490; --border:#e2ded8;
+    --red:#b8381a; --red-bg:rgba(184,56,26,0.10); --red-line:rgba(184,56,26,0.55);
+    --multi-bg:rgba(184,56,26,0.20); --multi-line:#b8381a;
+    --green:#2a7a4b; --green-bg:rgba(42,122,75,0.08); --green-border:rgba(42,122,75,0.3);
+  }
+  *{box-sizing:border-box;margin:0;padding:0;} html,body{height:100%;}
+  body{background:var(--bg);color:var(--ink);font-family:'Noto Serif JP',serif;font-size:16px;line-height:2;}
+
+  header{
+    position:sticky;top:0;z-index:100;
+    background:#faf8f4;color:#fff;
+    display:flex;align-items:center;justify-content:space-between;
+    padding:0 24px;height:52px;
+  }
+  .logo{font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.08em;}
+  .logo em{color:#b8381a;font-style:normal;}
+  .header-right{display:flex;align-items:center;gap:10px;}
+  .legend-s{font-family:'IBM Plex Mono',monospace;font-size:11px;background:var(--red-bg);border-bottom:2px solid var(--red-line);border-radius:2px;padding:0 5px;color:#ccc;}
+  .legend-m{font-family:'IBM Plex Mono',monospace;font-size:11px;background:var(--multi-bg);border-bottom:3px solid var(--multi-line);border-radius:2px;padding:0 5px;color:#ccc;}
+  .legend-txt{font-family:'Noto Sans JP',sans-serif;font-size:10px;color:rgba(255,255,255,.45);margin-right:4px;}
+  .shuffle-btn{
+    font-family:'IBM Plex Mono',monospace;font-size:10px;
+    background:none;border:1px solid rgba(255,255,255,.3);
+    color:#fff;border-radius:4px;padding:4px 14px;cursor:pointer;
+    transition:background .15s;
+  }
+  .shuffle-btn:hover{background:rgba(255,255,255,.1);}
+  .tw.target-word{
+    background:var(--red-bg);
+    border-bottom:2px solid var(--red-line);
+    border-radius:2px;padding:0 1px;
+    font-weight:700;cursor:pointer;
+  }
+
+  .shell{display:flex;min-height:calc(100vh - 52px);}
+
+  .card-area{
+    flex:1;display:flex;flex-direction:column;align-items:center;
+    justify-content:center;padding:40px 24px 60px;
+  }
+
+  .card{
+    background:var(--paper);border:1px solid var(--border);
+    border-radius:16px;
+    box-shadow:0 4px 28px rgba(0,0,0,.08);
+    padding:48px 56px;max-width:700px;width:100%;
+    min-height:260px;
+    
+  }
+
+  /* 英文面 */
+  .card-en .card-source{
+    font-family:'IBM Plex Mono',monospace;font-size:9px;
+    color:var(--ink-light);letter-spacing:.15em;text-transform:uppercase;
+    margin-bottom:20px;
+  }
+  .card-en .card-body{font-size:16px;line-height:2.1;}
+
+  /* 和訳面 */
+  .card-ja{display:none;}
+  .card-ja .card-source{
+    font-family:'IBM Plex Mono',monospace;font-size:9px;
+    color:var(--green);letter-spacing:.15em;text-transform:uppercase;
+    margin-bottom:20px;
+  }
+  .card-ja .card-body{
+    font-family:'Noto Sans JP',sans-serif;
+    font-size:15px;line-height:2;color:var(--ink-mid);
+    border-left:3px solid var(--green-border);
+    padding-left:18px;
+  }
+  .card-ja-note{
+    margin-top:16px;padding-top:12px;
+    border-top:1px dashed var(--border);
+    font-family:'IBM Plex Mono',monospace;font-size:9px;
+    color:var(--ink-light);letter-spacing:.05em;
+  }
+
+  .progress-bar{width:100%;height:3px;background:var(--border);border-radius:2px;margin-top:36px;}
+  .progress-fill{height:100%;background:var(--red);border-radius:2px;transition:width .25s;}
+
+  .card-nav{
+    display:flex;align-items:center;gap:16px;
+    max-width:700px;width:100%;margin-top:20px;
+  }
+  .nav-btn{
+    font-family:'IBM Plex Mono',monospace;font-size:11px;
+    border:1px solid var(--border);background:var(--paper);
+    color:var(--ink-mid);border-radius:6px;padding:9px 24px;
+    cursor:pointer;transition:all .15s;white-space:nowrap;
+  }
+  .nav-btn:hover:not(:disabled){border-color:var(--red);color:var(--red);}
+  .nav-btn:disabled{opacity:.25;cursor:default;}
+  .nav-btn.ja-btn{border-color:var(--green-border);color:var(--green);}
+  .nav-btn.ja-btn:hover{background:var(--green-bg);}
+  .card-progress{
+    font-family:'IBM Plex Mono',monospace;font-size:11px;
+    color:var(--ink-light);flex:1;text-align:center;
+  }
+  .card-state{
+    font-family:'Noto Sans JP',sans-serif;font-size:10px;
+    color:var(--ink-light);text-align:center;margin-top:4px;
+  }
+
+  .tw{background:var(--red-bg);border-bottom:2px solid var(--red-line);border-radius:2px;cursor:pointer;padding:0 2px;transition:background .12s;}
+  .tw:hover{background:rgba(184,56,26,.22);}
+  .tw.multi{background:var(--multi-bg);border-bottom:3px solid var(--multi-line);}
+  .tw.multi:hover{background:rgba(184,56,26,.30);}
+
+  .popup{
+    position:fixed;z-index:300;
+    background:var(--paper);border:1px solid var(--border);
+    border-radius:10px;
+    box-shadow:0 8px 36px rgba(0,0,0,.13),0 2px 8px rgba(0,0,0,.07);
+    padding:18px 22px 16px;max-width:300px;min-width:210px;
+    pointer-events:none;opacity:0;transform:translateY(8px);
+    transition:opacity .15s,transform .15s;
+  }
+  .popup.show{opacity:1;transform:translateY(0);}
+  .pp-word{font-family:'IBM Plex Mono',monospace;font-size:19px;font-weight:500;color:var(--red);margin-bottom:2px;}
+  .pp-num{font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--ink-light);margin-bottom:8px;}
+  .pp-jp{font-family:'Noto Sans JP',sans-serif;font-size:15px;font-weight:500;color:var(--ink);margin-bottom:10px;}
+  .pp-enc{border-top:1px solid var(--border);padding-top:10px;}
+  .pp-enc-label{font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--ink-light);letter-spacing:.12em;text-transform:uppercase;margin-bottom:7px;}
+  .pp-enc-row{display:flex;align-items:center;padding:3px 0;border-bottom:1px dotted var(--border);}
+  .pp-enc-row:last-child{border-bottom:none;}
+  .pp-enc-badge{font-family:'IBM Plex Mono',monospace;font-size:9px;background:var(--red);color:#fff;border-radius:3px;padding:2px 6px;}
+
+  @media(max-width:700px){
+    .card{padding:28px 22px;min-height:200px;}
+    .card-area{padding:24px 12px 48px;}
+    .legend-s,.legend-m,.legend-txt{display:none;}
+  }
+  .vocab-card-en{
+    font-family:'Noto Serif JP',serif;font-size:1.3rem;line-height:2;
+    color:var(--ink);margin-bottom:12px;
+  }
+  .vocab-card-word{
+    font-family:'IBM Plex Mono',monospace;font-size:2rem;font-weight:500;
+    color:var(--red);margin-bottom:4px;letter-spacing:.02em;
+  }
+  .vocab-card-jp{
+    font-family:'Noto Sans JP',sans-serif;font-size:.95rem;
+    color:var(--ink-mid);margin-bottom:20px;
+  }
+  .vocab-card-num{
+    font-family:'IBM Plex Mono',monospace;font-size:.75rem;
+    color:var(--ink-light);margin-bottom:16px;
+  }
+  .vocab-progress{
+    font-family:'IBM Plex Mono',monospace;font-size:.75rem;
+    color:var(--ink-light);margin-bottom:8px;
+  }
+to   { opacity:0; transform:scale(1.03); }
+  }
+}
+}
+  /* ══ TOP SCREEN ══ */
+  #top-screen {
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    width:100%;
+    height:100vh;
+    background:#faf8f4;
+    padding:24px;
+    box-sizing:border-box;
+    overflow:hidden;
+  }
+  #app-screen { display:none; }
+
+  .ts-eyebrow {
+    font-family:'IBM Plex Mono',monospace;
+    font-size:10px; letter-spacing:.22em; text-transform:uppercase;
+    color:var(--red); margin-bottom:20px; opacity:1;
+  }
+  .ts-h1 {
+    font-family:'Noto Serif JP',serif;
+    font-size:clamp(2rem,7vw,3rem);
+    font-weight:700; line-height:1.3;
+    color:#1c1a18;
+    margin-bottom:16px;
+  }
+  .ts-copy {
+    font-family:'Noto Sans JP',sans-serif;
+    font-size:.78rem; line-height:1.8;
+    color:#b8381a;
+    margin-bottom:40px;
+    letter-spacing:.04em;
+  }
+  .ts-btn {
+    display:inline-flex; align-items:center; gap:12px;
+    background:var(--red); color:#fff;
+    border:none; border-radius:3px;
+    font-family:'Noto Sans JP',sans-serif;
+    font-size:.95rem; font-weight:500;
+    padding:15px 36px; cursor:pointer;
+    transition:opacity .15s, transform .15s;
+  }
+  .ts-btn:hover { opacity:.88; transform:translateY(-1px); }
+  .ts-btn-arr { font-family:'IBM Plex Mono',monospace; transition:transform .15s; }
+  .ts-btn:hover .ts-btn-arr { transform:translateX(3px); }
+
+</style>
+</head>
+<body>
+<div id="top-screen">
+  <div style="width:100%;max-width:440px;margin:0 auto;text-align:center;padding:110px 16px 0;">
+    <div class="ts-eyebrow">Eiken Pre-1</div>
+    <h1 class="ts-h1">Encounter. Retain.</h1>
+    <p class="ts-copy">The more you encounter a word, the deeper it sticks.</p>
+    <ul style="
+      list-style:none;
+      text-align:left;
+      margin:0 auto 36px;
+      max-width:320px;
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+    ">
+      <li style="font-family:'IBM Plex Mono',monospace;font-size:.82rem;color:#5a5650;display:flex;gap:10px;align-items:flex-start;">
+        <span style="color:var(--red);font-family:'IBM Plex Mono',monospace;font-size:.75rem;flex-shrink:0;margin-top:2px;">01</span>
+        <span>Real exam sentences from the past 3 years — experience words in context</span>
+      </li>
+      <li style="font-family:'IBM Plex Mono',monospace;font-size:.82rem;color:#5a5650;display:flex;gap:10px;align-items:flex-start;">
+        <span style="color:var(--red);font-family:'IBM Plex Mono',monospace;font-size:.75rem;flex-shrink:0;margin-top:2px;">02</span>
+        <span>500 top-frequency words with example sentences. Target word highlighted</span>
+      </li>
+      <li style="font-family:'IBM Plex Mono',monospace;font-size:.82rem;color:#5a5650;display:flex;gap:10px;align-items:flex-start;">
+        <span style="color:var(--red);font-family:'IBM Plex Mono',monospace;font-size:.75rem;flex-shrink:0;margin-top:2px;">03</span>
+        <span>English → Japanese, 2-step flip cards. Shuffle for a fresh encounter every time</span>
+      </li>
+    </ul>
+    <button class="ts-btn" onclick="startApp()">
+      Start studying <span class="ts-btn-arr">→</span>
+    </button>
+  </div>
+</div>
+<div id="app-screen">
+<header>
+  <div class="logo">Eiken Pre-1 <em>//</em> Word Encounter</div>
+  <div class="header-right">
+    <span class="legend-txt">Freq-A:</span>
+    <span class="legend-s">word</span>
+    <span class="legend-m">word</span>
+    <span class="legend-txt" style="margin-left:4px;">= appears multiple times</span>
+    <button class="shuffle-btn" onclick="doShuffle()">↺ Shuffle</button>
+  </div>
+</header>
+
+<div class="shell">
+
+  <div class="card-area" id="card-wrap">
+    <div class="card" id="card">
+      <!-- 英文面 -->
+      <div class="card-en" id="card-en">
+        <div class="card-source" id="card-source-en"></div>
+        <div class="card-body" id="card-body-en"></div>
+        <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+      </div>
+      <!-- 和訳面 -->
+      <div class="card-ja" id="card-ja">
+        <div class="card-source" id="card-source-ja">和訳</div>
+        <div class="card-body" id="card-body-ja"></div>
+        <div class="card-ja-note" id="card-ja-note"></div>
+      </div>
+    </div>
+
+    <div class="card-nav">
+      <button class="nav-btn" id="btn-prev" onclick="cardNav(-1)">← 前へ</button>
+      <div style="flex:1;text-align:center;">
+        <div class="card-progress" id="card-progress"></div>
+        <div class="card-state" id="card-state"></div>
+      </div>
+      <button class="nav-btn" id="btn-next" onclick="cardNext()">次へ →</button>
+    </div>
+  </div>
+</div>
+
+<div class="popup" id="popup">
+  <div class="pp-word" id="pp-word"></div>
+  <div class="pp-num" id="pp-num"></div>
+  <div class="pp-jp" id="pp-jp"></div>
+  <div class="pp-enc" id="pp-enc"></div>
+</div>
+
+
+<script>
+
+
+
+
+
+const VOCAB = [
+  {n:1,  w:"last",         jp:"（動）続く",                 src:["2025-3大問1"]},
+  {n:2,  w:"affect",       jp:"（動）影響を与える",          src:["2025-3長文①"]},
+  {n:3,  w:"claim",        jp:"（動）主張する",              src:["2025-1長文②","2025-2大問1","2025-3大問3"]},
+  {n:5,  w:"issue",        jp:"（動）声明を出す、発行する",  src:["2025-3大問3"]},
+  {n:7,  w:"occur",        jp:"（動）起きる、起こる",        src:["2025-2長文②","2025-3長文①","2025-3大問3"]},
+  {n:9,  w:"consume",      jp:"（動）消費する",              src:["2025-2長文②"]},
+  {n:11, w:"fire",         jp:"（動）解雇する",              src:["2025-3大問3"]},
+  {n:15, w:"decline",      jp:"（動）減少する",              src:["2025-2長文①"]},
+  {n:18, w:"ensure",       jp:"（動）確実にする",            src:["2025-1大問1","2025-3大問3"]},
+  {n:21, w:"identify",     jp:"（動）特定する",              src:["2025-2長文②"]},
+  {n:29, w:"reveal",       jp:"（動）明らかにする",          src:["2025-2長文②"]},
+  {n:33, w:"cell",         jp:"（名）細胞",                  src:["2025-3長文①"]},
+  {n:37, w:"option",       jp:"（名）選択肢",                src:["2025-3大問1"]},
+  {n:41, w:"tax",          jp:"（名）税金",                  src:["2025-1大問1"]},
+  {n:45, w:"evidence",     jp:"（名）証拠、根拠",            src:["2025-1大問1","2025-3大問3"]},
+  {n:46, w:"attempt",      jp:"（名/動）試み",               src:["2025-1長文①"]},
+  {n:49, w:"factor",       jp:"（名）要因",                  src:["2025-1長文②"]},
+  {n:51, w:"chemical",     jp:"（形/名）化学的な、化学薬品", src:["2025-2長文②","2025-3長文①"]},
+  {n:52, w:"media",        jp:"（名）メディア",              src:["2025-2長文①","2025-3大問3"]},
+  {n:54, w:"supply",       jp:"（名）供給",                  src:["2025-1大問1","2025-3大問1"]},
+  {n:74, w:"resource",     jp:"（名）資源",                  src:["2025-3長文①"]},
+  {n:76, w:"contract",     jp:"（名）契約書",                src:["2025-3大問3"]},
+  {n:84, w:"current",      jp:"（形）現在の",                src:["2025-1長文②"]},
+  {n:86, w:"significant",  jp:"（形）重要な、著しい",        src:["2025-2長文①"]},
+  {n:88, w:"military",     jp:"（形）軍隊の",                src:["2025-2大問1"]},
+  {n:96, w:"agricultural", jp:"（形）農業の",                src:["2025-3長文①"]},
+  {n:97, w:"overall",      jp:"（形）全体的な",              src:["2025-2長文①"]},
+  {n:98, w:"additional",   jp:"（形）追加の",                src:["2025-2長文①"]},
+  {n:104,w:"determine",    jp:"（動）決定する",              src:["2025-3長文①"]},
+  {n:106,w:"conduct",      jp:"（動）実施する",              src:["2025-2長文①"]},
+  {n:111,w:"demonstrate",  jp:"（動）示す、実演する",        src:["2025-2長文②"]},
+  {n:116,w:"protest",      jp:"（動/名）抗議する",           src:["2025-1長文①","2025-3大問3"]},
+  {n:124,w:"intend",       jp:"（動）意図する",              src:["2025-3大問3"]},
+  {n:127,w:"figure",       jp:"（名）人物、数字",            src:["2025-2大問1"]},
+  {n:135,w:"immigrant",    jp:"（名）移民、移住者",          src:["2025-3大問3"]},
+  {n:145,w:"threat",       jp:"（名）脅威",                  src:["2025-3長文①"]},
+  {n:153,w:"medication",   jp:"（名）薬、薬物療法",          src:["2025-2長文②"]},
+  {n:162,w:"range",        jp:"（名）範囲、幅",              src:["2025-3長文①"]},
+  {n:163,w:"victim",       jp:"（名）被害者、犠牲者",        src:["2025-1大問1"]},
+  {n:176,w:"wage",         jp:"（名）賃金",                  src:["2025-3大問3"]},
+  {n:177,w:"drone",        jp:"（名）ドローン、無人機",      src:["2025-2大問1"]},
+  {n:183,w:"limited",      jp:"（形）限られた",              src:["2025-2長文②"]},
+  {n:185,w:"advanced",     jp:"（形）高度な、進んだ",        src:["2025-2長文①","2025-2長文②"]},
+  {n:187,w:"genetic",      jp:"（形）遺伝子の",              src:["2025-3長文①"]},
+  {n:188,w:"radical",      jp:"（形）根本的な、急進的な",    src:["2025-3大問3"]},
+  {n:195,w:"complex",      jp:"（形）複雑な",                src:["2025-1長文①","2025-2長文①","2025-3長文①"]},
+  {n:202,w:"lessen",       jp:"（動）減らす、軽減する",      src:["2025-1長文①"]},
+  {n:206,w:"suspect",      jp:"（動）疑う",                  src:["2025-1大問1"]},
+  {n:210,w:"adapt",        jp:"（動）適応する",              src:["2025-1長文②"]},
+  {n:246,w:"labor",        jp:"（名）労働、労働力",          src:["2025-1長文①","2025-3大問3"]},
+  {n:269,w:"widespread",   jp:"（形）広範囲にわたる",        src:["2025-1大問1"]},
+  {n:270,w:"alternative",  jp:"（形/名）代替の、代替手段",   src:["2025-3長文①"]},
+  {n:273,w:"specific",     jp:"（形）具体的な、特定の",      src:["2025-3長文①"]},
+  {n:289,w:"eventually",   jp:"（副）最終的に、ついに",      src:["2025-1大問1","2025-2長文①"]},
+  {n:291,w:"previously",   jp:"（副）以前に",                src:["2025-2長文②"]},
+  {n:294,w:"constantly",   jp:"（副）絶えず、常に",          src:["2025-3長文①"]},
+  {n:308,w:"interact",     jp:"（動）交流する",              src:["2025-1大問1"]},
+  {n:309,w:"inspire",      jp:"（動）奮起させる",            src:["2025-1長文①"]},
+  {n:314,w:"convince",     jp:"（動）説得する",              src:["2025-3大問3"]},
+  {n:325,w:"concept",      jp:"（名）概念",                  src:["2025-3長文①"]},
+  {n:350,w:"welfare",      jp:"（名）福祉",                  src:["2025-1長文①"]},
+  {n:354,w:"layer",        jp:"（名）層",                    src:["2025-2長文①"]},
+  {n:359,w:"division",     jp:"（名）分断、分割",            src:["2025-3大問3"]},
+  {n:378,w:"multiple",     jp:"（形）多数の",                src:["2025-1長文②"]},
+  {n:379,w:"crucial",      jp:"（形）重大な、不可欠な",      src:["2025-1大問1","2025-2長文①"]},
+  {n:380,w:"remote",       jp:"（形）遠い、人里離れた",      src:["2025-2大問1"]},
+  {n:381,w:"encouraging",  jp:"（形）励みになる",            src:["2025-1長文①"]},
+  {n:391,w:"intellectual", jp:"（形）知的な",                src:["2025-2長文②"]},
+  {n:402,w:"stimulate",    jp:"（動）刺激する",              src:["2025-3長文①"]},
+  {n:403,w:"distract",     jp:"（動）気をそらす",            src:["2025-1大問1"]},
+  {n:414,w:"infect",       jp:"（動）感染させる",            src:["2025-3長文①"]},
+  {n:423,w:"proceed",      jp:"（動）進む、向かう",          src:["2025-1長文①","2025-2長文①"]},
+  {n:426,w:"swallow",      jp:"（動）飲み込む",              src:["2025-2長文②"]},
+  {n:429,w:"consequence",  jp:"（名）結果、影響",            src:["2025-2長文①"]},
+  {n:432,w:"obstacle",     jp:"（名）障害、障害物",          src:["2025-3大問3"]},
+  {n:436,w:"contribution", jp:"（名）貢献",                  src:["2025-2長文①"]},
+  {n:450,w:"coverage",     jp:"（名）報道",                  src:["2025-2長文①"]},
+  {n:459,w:"scale",        jp:"（名）規模、大きさ",          src:["2025-3長文①"]},
+  {n:479,w:"initial",      jp:"（形）最初の",                src:["2025-1長文①"]},
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// ── でる度B ──
+  {n:519,w:"verify",         jp:"（動）確認する、検証する",   src:["2025-2長文①"]},
+  {n:551,w:"investigation",  jp:"（名）調査",                 src:["2025-1大問1"]},
+  {n:559,w:"incident",       jp:"（名）出来事、事件",         src:["2025-3大問3"]},
+  {n:573,w:"novel",          jp:"（形）斬新な",               src:["2025-3大問1"]},
+  {n:614,w:"unite",          jp:"（動）統一する",             src:["2025-1長文①"]},
+  {n:651,w:"pathway",        jp:"（名）経路",                 src:["2025-3長文①"]},
+  {n:673,w:"recognition",    jp:"（名）認識、表彰",           src:["2025-3大問3"]},
+  {n:721,w:"launch",         jp:"（動）始める、打ち上げる",   src:["2025-2長文①"]},
+  {n:753,w:"era",            jp:"（名）時代",                 src:["2025-2大問1"]},
+  {n:822,w:"reform",         jp:"（名/動）改革する",          src:["2025-1長文①","2025-3大問3"]},
+  {n:841,w:"discrimination", jp:"（名）差別",                 src:["2025-2長文①"]},
+  {n:881,w:"industrial",     jp:"（形）産業の",               src:["2025-1長文①"]},
+  {n:964,w:"unrest",         jp:"（名）不安、動乱",           src:["2025-1長文①"]},
+  // ── でる度C ──
+  {n:1017,w:"yield",        jp:"（動）産出する、譲る",        src:["2025-3長文①"]},
+  {n:1044,w:"orbit",        jp:"（名/動）軌道、周回する",     src:["2025-2長文①"]},
+  {n:1045,w:"trial",        jp:"（名）裁判、試み",            src:["2025-3大問3"]},
+  {n:1060,w:"perspective",  jp:"（名）視点、見方",            src:["2025-3大問1"]},
+  {n:1061,w:"physics",      jp:"（名）物理学",                src:["2025-2長文①"]},
+  {n:1068,w:"striking",     jp:"（形）目立つ、印象的な",      src:["2025-3大問3"]},
+  {n:1121,w:"divert",       jp:"（動）そらす、転用する",      src:["2025-3長文①"]},
+  {n:1123,w:"provoke",      jp:"（動）引き起こす、怒らせる",  src:["2025-3大問3"]},
+  {n:1169,w:"contemporary", jp:"（形）現代の、同時代の",      src:["2025-2長文①"]},
+  {n:1248,w:"fatigue",      jp:"（名）疲労",                  src:["2025-2大問1"]},
+  {n:1266,w:"diversity",    jp:"（名）多様性",                src:["2025-1長文②"]},
+  {n:1287,w:"sustainable",  jp:"（形）持続可能な",            src:["2025-3長文①"]},
+  {n:1347,w:"affair",       jp:"（名）事件、問題",            src:["2025-3大問3"]},
+  {n:1450,w:"longevity",    jp:"（名）長寿、長続き",          src:["2025-1長文②"]},
+  {n:1458,w:"norm",         jp:"（名）規範、標準",            src:["2025-2長文①"]},
+  {n:1598,w:"repetitive",   jp:"（形）繰り返しの多い",        src:["2025-2長文①"]},
+];
+
+const ALL_BLOCKS = [
+  {label:"2025-1 大問1",
+   en:"The rescue teams worked to ensure all victims were accounted for after the disaster.",
+   ja:"救助チームは、災害後に全ての被災者の安否が確認されるよう万全を期して活動した。"},
+
+  {label:"2025-1 大問1",
+   en:"Using smartphones during class will distract students from their work. Many schools now ban phone use in classrooms.",
+   ja:"授業中にスマートフォンを使うと、生徒たちの学習への集中が妨げられる。そのため、多くの学校が教室内での携帯電話の使用を禁止している。"},
+
+  {label:"2025-1 大問1",
+   en:"The program encouraged students to interact with local community members. This initiative helped build a sense of belonging.",
+   ja:"そのプログラムは、生徒たちが地域住民と交流することを促した。この取り組みは、帰属意識を育む助けとなった。"},
+
+  {label:"2025-1 大問1",
+   en:"The artist's work was initially met with skepticism but eventually gained widespread acclaim.",
+   ja:"その芸術家の作品は当初懐疑的に受け取られたが、最終的には広く称賛を得るに至った。"},
+
+  {label:"2025-1 大問1",
+   en:"The detective managed to track down the suspect after weeks of investigation. The evidence was compelling.",
+   ja:"その刑事は、数週間にわたる捜査の末についに容疑者を追い詰めた。証拠は非常に説得力があった。"},
+
+  {label:"2025-1 大問1",
+   en:"She decided to pass up the job offer in order to focus on her studies. It was a crucial decision that shaped her career.",
+   ja:"彼女は勉学に集中するために就職のオファーを断ることにした。それは彼女のキャリアを形作る重大な決断だった。"},
+
+  {label:"2025-1 大問1",
+   en:"The company used a legal loophole to avoid paying the full amount of tax. The authorities eventually closed it.",
+   ja:"その会社は法律の抜け穴を利用して税金を全額納めることを回避した。当局は最終的にその抜け穴を塞いだ。"},
+
+  {label:"2025-1 大問1",
+   en:"Please ensure all employees are notified before the changes take effect.",
+   ja:"変更が施行される前に、全従業員に確実に周知するようにしてください。"},
+
+  {label:"2025-1 長文①",
+   en:"In 1911, a group of schoolchildren in Wales walked out of their school in protest. They then proceeded to march through the streets of their town, encouraging students from other schools to join them along the way. The strike ended peacefully on the same day, but news of the incident spread to other towns and cities across the country. As a result, a series of school strikes occurred across the United Kingdom. In the end, schoolchildren from around sixty schools are thought to have participated in similar protests.",
+   ja:"1911年、ウェールズの小学生たちが抗議のために学校を退場した。彼らはその後、町の通りを行進し、沿道の他の学校の生徒たちにも合流するよう呼びかけた。ストライキはその日のうちに平和的に終結したが、この出来事のニュースは国中の他の町や都市へと広まった。その結果、イギリス全土で一連の学校ストライキが起きた。最終的に、約60校の学校の子どもたちが同様の抗議行動に参加したと考えられている。"},
+
+  {label:"2025-1 長文①",
+   en:"Reports of the initial strike state that it began because of the unfair punishment of a student at the school. However, some historians suggest the reason was more complex. The strike followed many months of public unrest in the United Kingdom, during which workers called for improved labor conditions and many industrial strikes occurred. The schoolchildren would have seen members of their families participate in these protests, which historians believe inspired them to stand up for their own rights as well.",
+   ja:"最初のストライキに関する報告によれば、それはある生徒への不当な罰に端を発したとされている。しかし、一部の歴史家はその理由はより複雑だと指摘する。このストライキは、労働者たちが労働条件の改善を求めて声を上げ、多くの産業ストライキが起きたイギリスの長期にわたる社会不安の後に起きたのだ。子どもたちは家族がこうした抗議活動に参加するのを目の当たりにしており、それが彼ら自身も自分たちの権利のために立ち上がる動機になったと歴史家たちは考えている。"},
+
+  {label:"2025-1 長文①",
+   en:"School authorities attempted to play down the importance of the school strikes by pointing out that only a small percentage of the national school population participated. While this was true, it did not lessen the significance of the protests. The strikes also provided the stimulus for societal reforms that would end up improving child welfare in the United Kingdom.",
+   ja:"学校当局は、全国の学校の生徒のほんのわずかしか参加していないと指摘することで、学校ストライキの重要性を矮小化しようとした。それは事実であったが、それでも抗議活動の意義は少しも損なわれなかった。またこのストライキは、最終的にイギリスにおける児童福祉の向上につながる社会改革を促す契機にもなった。"},
+
+  {label:"2025-1 長文②",
+   en:"When researcher Justin Berg looked into which bands were able to avoid becoming one-hit wonders, he discovered two key factors. The first was novelty, or how different songs are from other current music. The second key factor for career longevity was diversity, or the degree of variety among an artist's own songs. Berg found that artists whose songs had both these qualities early in their careers were far less likely to be one-hit wonders.",
+   ja:"研究者のジャスティン・バーグが、どのバンドがいわゆる「一発屋」になることを回避できたかを調べたところ、2つの重要な要因を発見した。1つ目は「新規性」、つまり楽曲が他の現在の音楽とどれだけ異なるかという点だ。キャリアの長続きに関わる2つ目の重要な要因は「多様性」、すなわちアーティスト自身の楽曲がどれだけ多彩かという点だった。バーグは、キャリアの早い段階でこの2つの特性を持つ楽曲を出したアーティストは、一発屋になる可能性がはるかに低いと突き止めた。"},
+
+  {label:"2025-1 長文②",
+   en:"According to Berg, songs that are too different from what is currently fashionable have a lower probability of climbing the music rankings in the first place. Artists who desire multiple hits benefit from producing work that is similar to their first success, with only small changes to adapt to new trends. Berg believes that the balance between reminding listeners of the artist's initial hits while still sounding up-to-date is the true recipe for continued success.",
+   ja:"バーグによれば、現在流行しているものとあまりにもかけ離れた楽曲は、そもそも音楽チャートを上昇できる可能性が低いという。複数のヒットを望むアーティストは、新しいトレンドに適応するための小さな変化を加えながらも、最初の成功作に似た作品を生み出すことが有益だ。バーグは、聴衆にアーティストの初期のヒット曲を想起させながら、なおかつ現代的に聞こえるバランスこそが、継続的な成功の真の秘訣だと考えている。"},
+
+  {label:"2025-2 大問1",
+   en:"The couple decided not to buy the house in the countryside because it was so remote. The nearest town was over two hours away by car.",
+   ja:"その夫婦は、田舎の家があまりにも人里離れた場所にあったため、購入しないことにした。最寄りの町まで車で2時間以上かかった。"},
+
+  {label:"2025-2 大問1",
+   en:"The country's military was able to shoot down the enemy's spy drone before it could gather any information about the country's defenses.",
+   ja:"その国の軍隊は、敵の偵察ドローンが防衛情報を収集する前に撃墜することができた。"},
+
+  {label:"2025-2 大問1",
+   en:"The politician claimed he was indebted to no one, but everyone knew he had received donations from many companies to help his campaign.",
+   ja:"その政治家は誰にも借りはないと主張したが、選挙活動を支援するために多くの企業から献金を受け取っていたことは皆が知っていた。"},
+
+  {label:"2025-2 大問1",
+   en:"The doctor told Emma she was suffering from fatigue due to overwork. He said that with a break and plenty of rest, she would recover quickly.",
+   ja:"医者はエマに、過労による疲労を患っていると告げた。休息をとり十分に休めば、すぐに回復するだろうと言った。"},
+
+  {label:"2025-2 大問1",
+   en:"The documentary on the war was so powerful that it evoked strong feelings of sadness and anger in the viewers. It featured many key figures from that era.",
+   ja:"その戦争のドキュメンタリーは非常に強烈で、視聴者に深い悲しみと怒りの感情を呼び起こした。その時代の多くの重要な人物が登場した。"},
+
+  {label:"2025-2 長文①",
+   en:"Some US astronauts became household names in the 1950s and '60s, partly due to the media coverage of their achievements. Behind the scenes, however, others played a crucial role in making US space missions successful. These women, who came to be called human computers, conducted complex calculations in areas such as spacecraft navigation, rocket aerodynamics, and orbital physics. Without them, it would have been impossible to launch spacecraft, and any inaccuracies could have had life-threatening consequences for the astronauts.",
+   ja:"1950〜60年代、一部のアメリカの宇宙飛行士たちは、その業績に関するメディア報道もあって広く知られる存在となった。しかし舞台裏では、アメリカの宇宙ミッションを成功させるために欠かせない役割を担った人々がいた。「ヒューマン・コンピューター」と呼ばれるようになった女性たちで、宇宙船の航法、ロケットの空気力学、軌道物理学などの分野で複雑な計算を行った。彼女たちなしには宇宙船の打ち上げは不可能であり、計算の誤りは宇宙飛行士たちの命に関わる結果を招きかねなかった。"},
+
+  {label:"2025-2 長文①",
+   en:"Partly due to the discriminatory nature of contemporary societal norms, employing women meant that salaries and therefore overall costs could be dramatically reduced. Although human-computer work was sometimes repetitive, it often required advanced math skills.",
+   ja:"当時の社会規範が持つ差別的な性質もあって、女性を雇用することは給与、ひいては全体的なコストを大幅に削減できることを意味した。ヒューマン・コンピューターの仕事は単調な作業を含むこともあったが、高度な数学的スキルを必要とすることも多かった。"},
+
+  {label:"2025-2 長文①",
+   en:"African American women faced an additional layer of discrimination as they were forced to conduct much of their work in segregated facilities. As electronic computers became more advanced in the 1960s, the role of human computers eventually declined. However, their contribution was significant. When John Glenn became the first American to orbit Earth in 1962, he insisted that Katherine Johnson personally verify the electronic computer's calculations before he would proceed with the mission.",
+   ja:"アフリカ系アメリカ人女性たちはさらなる差別の重圧にさらされ、隔離された施設での業務を余儀なくされた。1960年代に電子コンピューターが高度化するにつれ、ヒューマン・コンピューターの役割はやがて縮小していった。しかし、彼女たちの貢献は計り知れない。1962年にジョン・グレンがアメリカ人初の地球周回飛行を行った際、彼はキャサリン・ジョンソンが電子コンピューターの計算を直接確認するまでミッションを続行しないと主張した。"},
+
+  {label:"2025-2 長文②",
+   en:"Plants produce many chemical substances to protect themselves against disease, and some of these chemicals have medicinal properties. A growing body of research shows that animals have learned to recognize and consume these substances to treat and prevent illnesses.",
+   ja:"植物は病気から身を守るために多くの化学物質を生成しており、そのいくつかには薬効がある。蓄積されつつある研究成果によると、動物たちはこれらの物質を認識し、病気の治療や予防のために摂取することを学んでいるという。"},
+
+  {label:"2025-2 長文②",
+   en:"Self-medication by animals was first recorded in the 1970s by researchers studying a group of chimpanzees in Tanzania. They observed some chimpanzees swallowing the leaves of plants whole without chewing them. Further observations revealed that the behavior occurred more frequently when stomach parasites were common among the group. The researchers used the term \"zoopharmacognosy\" to refer to this self-medicating behavior.",
+   ja:"動物の自己投薬が初めて記録されたのは1970年代のことで、タンザニアのチンパンジーの群れを研究していた研究者たちによるものだった。彼らは一部のチンパンジーが植物の葉を噛まずにそのまま丸飲みするのを観察した。さらなる観察により、群れの中で胃の寄生虫が蔓延しているときにこの行動がより頻繁に見られることが明らかになった。研究者たちはこの自己投薬行動を「動物薬理学（ズーファーマコグノシー）」と呼んだ。"},
+
+  {label:"2025-2 長文②",
+   en:"For many years, it was believed that this behavior was limited to animals with advanced intellectual ability. However, a recent review of research has shown that self-medication is much more common than was previously thought and is even demonstrated by some insects. Researchers also believe that studying zoopharmacognosy may be useful for identifying plant-based medication that could benefit humans.",
+   ja:"長年にわたり、この行動は高度な知的能力を持つ動物に限られると考えられていた。しかし最近の研究レビューにより、自己投薬は以前考えられていたよりはるかに広く見られることが示され、一部の昆虫においても確認されている。また研究者たちは、動物薬理学を研究することが、人間に有益な植物由来の薬を特定する上で役立つ可能性があると考えている。"},
+
+  {label:"2025-3 大問1",
+   en:"The novel was fascinating because it told the same story from several different perspectives. Each character saw the events in a very different way.",
+   ja:"その小説はいくつかの異なる視点から同じ物語を語っていたため、非常に魅力的だった。それぞれの登場人物は出来事をまったく異なる見方でとらえていた。"},
+
+  {label:"2025-3 大問1",
+   en:"The company gave its salespeople autonomy over their daily work. They are now free to make their own decisions — the last say on each option belongs to them.",
+   ja:"その会社は営業担当者に日々の業務における自律性を与えた。彼らは今や自分で判断を下すことができ、各選択肢についての最終決定権は彼ら自身にある。"},
+
+  {label:"2025-3 大問1",
+   en:"The children were hungry, so the couple decided to make for the nearest town to find a restaurant and get a fresh supply of snacks.",
+   ja:"子どもたちがお腹を空かせていたので、夫婦はレストランを見つけて軽食を新たに調達しようと、最寄りの町へ向かうことにした。"},
+
+  {label:"2025-3 大問1",
+   en:"The company wants to try all other options first, but it cannot rule out reducing its staff if its poor sales continue.",
+   ja:"その会社はまず他のすべての選択肢を試みたいと考えているが、売上不振が続くならば人員削減を排除することはできない。"},
+
+  {label:"2025-3 大問1",
+   en:"The two fighter jets were flying so close to one another that the pilot of one of them was afraid they would collide.",
+   ja:"2機の戦闘機はあまりにも近接して飛行していたため、一方のパイロットは衝突するのではないかと恐れた。"},
+
+  {label:"2025-3 大問1",
+   en:"Medical students spend a lot of time studying human anatomy. They must memorize the terms for even the smallest parts of the body.",
+   ja:"医学生たちは人体解剖学の勉強に多くの時間を費やす。最も小さな体の部位に至るまで、その用語を暗記しなければならない。"},
+
+  {label:"2025-3 長文①",
+   en:"This level of production has only been achieved through modern agriculture's increasing reliance on chemical pesticides to protect crops from insects that feed on plants and microbial pathogens such as bacteria and fungi. These pests can impair plant growth and lead to significantly reduced crop yields. Pests also develop resistance to pesticides, so researchers are constantly looking for alternative crop-protection methods.",
+   ja:"これほどの生産水準は、植物を食い荒らす害虫や細菌・菌類などの微生物病原体から作物を守るための化学農薬への依存を高めることで現代農業が達成してきたものだ。これらの害虫は植物の生育を妨げ、収穫量を大幅に低下させることがある。また害虫は農薬への耐性をつけるため、研究者たちは常に代替的な作物保護の方法を模索している。"},
+
+  {label:"2025-3 長文①",
+   en:"A promising new approach to crop protection is the concept of induced resistance. This works by activating plants' natural defenses, which range from destroying pathogen-infected cells to releasing toxins to kill insects. Defense priming involves applying stress to plants to stimulate a weak defense response, preparing them to react strongly to threats in the future. Researchers have found that the protection can even be carried into the next generation, although the genetic mechanism by which this occurs has yet to be determined.",
+   ja:"作物保護における有望な新しいアプローチが「誘導抵抗性」という概念だ。これは植物が本来持つ防御機構を活性化させることで機能し、その防御は病原菌に感染した細胞の破壊から害虫を殺す毒素の放出まで多岐にわたる。「ディフェンス・プライミング」は植物にストレスを与えて弱い防御反応を引き起こし、将来の脅威に対して強く反応できるよう準備させるプロセスだ。研究者たちは、この保護効果が次世代にまで引き継がれることも発見しているが、そのメカニズムを担う遺伝的な仕組みはまだ解明されていない。"},
+
+  {label:"2025-3 長文①",
+   en:"Induced resistance is the result of a complex network of developmental and environmental pathways in the plant. Using it effectively is not as simple as introducing a gene for a specific characteristic. Many aspects need to be just right, including the growing conditions and agricultural methods used. However, when combined with other forms of natural crop protection, induced resistance can help minimize the need for pesticides and make agriculture more sustainable. One limitation is that diverting plants' resources toward defense can lead to reduced growth, which affects crop yields and scale.",
+   ja:"誘導抵抗性は、植物における発達経路と環境経路が複雑に絡み合ったネットワークの産物だ。それを効果的に活用することは、特定の特性を持つ遺伝子を導入するほど単純ではない。栽培条件や農業手法など、多くの要素が適切でなければならない。しかし他の自然な作物保護手段と組み合わせることで、誘導抵抗性は農薬の必要性を最小限に抑え、農業をより持続可能なものにする助けになりうる。一つの制約は、植物の資源を防御に振り向けることで生育が抑制され、収穫量や生産規模に影響が出る可能性があることだ。"},
+
+  {label:"2025-3 大問3",
+   en:"On May 3, 1886, at least two striking workers were killed by the police at a demonstration in Chicago. Angered by the deaths, labor rights activists organized a gathering for the next day at Haymarket Square. Many thousands of flyers were distributed — printed not only in English but also in German for German-speaking immigrant workers. One of the attendees was the Chicago mayor, there to ensure the protest passed peacefully.",
+   ja:"1886年5月3日、シカゴのデモでストライキ中の労働者が少なくとも2名、警察によって殺害された。その死に憤慨した労働権運動家たちは、翌日ヘイマーケット広場での集会を組織した。英語だけでなく、ドイツ語を話す移民労働者のためにドイツ語でも印刷されたビラが何千枚も配られた。参加者の一人にはシカゴ市長もおり、抗議活動が平和的に終わるよう確認するためにその場に来ていた。"},
+
+  {label:"2025-3 大問3",
+   en:"Chicago became a center for activists concerned about workers' rights in factories, shipyards, and mills. Some pro-worker groups were radical, some were socialist, while others were less politically oriented. The movement's main rallying cry was a demand to limit working hours to eight a day. According to Professor Adelman, one obstacle to its success was a lack of strict enforcement. This gave employers room to force employees — often poor immigrants — to sign contracts agreeing to longer working days, accepting low wages.",
+   ja:"シカゴは、工場・造船所・製粉所における労働者の権利を訴える活動家たちの中心地となっていた。労働者支持派のグループの中には急進的なもの、社会主義的なもの、政治色の薄いものなどがあった。運動の最大の訴えは、1日の労働時間を8時間に制限するよう求めるものだった。アデルマン教授によると、その実現を阻んだ障害の一つは、法律の厳格な執行が欠如していたことだった。これにより雇用者は、しばしば貧しい移民である従業員に、より長い労働日と低賃金を認める契約に署名させる余地を持った。"},
+
+  {label:"2025-3 大問3",
+   en:"The May 4 incident provoked a strong response from some newspapers. Eight men were charged in connection with the bombing. Even though there were concerns about jury bias and a lack of evidence, most of the men were given the death penalty. According to Adelman, the trial ranked as one of the most notorious in American history.",
+   ja:"5月4日の事件は一部の新聞による強烈な反応を引き起こした。8人の男性が爆弾事件への関与で起訴された。陪審の偏向や証拠不足への懸念があったにもかかわらず、ほとんどの被告に死刑が宣告された。アデルマンによれば、この裁判はアメリカ史上最も悪名高いものの一つとして位置づけられている。"},
+
+  {label:"2025-3 大問3",
+   en:"In the early 1890s, the governor of Illinois concluded that the trial had been unfair. The surviving men were pardoned and released from prison — a decision condemned by some industrialists and sections of the media. The Haymarket Affair exposed the social and economic division that were commonplace at the time. The incident contributed to important labor reforms and greater recognition of workers' rights.",
+   ja:"1890年代初頭、イリノイ州知事は裁判が不公正であったと結論づけた。生き残った被告たちは恩赦を受けて釈放されたが、その決定は一部の実業家やメディアから批判を受けた。ヘイマーケット事件は、当時広く存在した社会的・経済的な分断を露わにした。この出来事は重要な労働改革と労働者の権利のより広い認知に貢献した。"},
+  {label:"でる度A #1",target:"last",jp:"続く",
+   en:"Do you think that true motivation can last even when results are slow to appear?",
+   ja:"本当のモチベーションは、結果がなかなか出ないときでも続くと思いますか？"},
+  {label:"でる度A #2",target:"affect",jp:"影響を与える",
+   en:"I honestly think that the people around you deeply affect the kind of person you become.",
+   ja:"周囲の人々があなたがどんな人間になるかに深く影響を与えると、私は正直思います。"},
+  {label:"でる度A #3",target:"claim",jp:"主張する",
+   en:"Do you think she has the right to claim that her approach is the only correct one?",
+   ja:"彼女のアプローチだけが正しいと主張する権利が彼女にあると思いますか？"},
+  {label:"でる度A #4",target:"ship",jp:"出荷する",
+   en:"Do you think she realizes how much effort it takes to ship products safely across the world?",
+   ja:"世界中に製品を安全に出荷するためにどれほどの努力が必要か、彼女は気づいていると思いますか？"},
+  {label:"でる度A #5",target:"issue",jp:"声明を出す",
+   en:"Do you think the government should issue a clearer statement about its environmental policy?",
+   ja:"政府は環境政策についてより明確な声明を出すべきだと思いますか？"},
+  {label:"でる度A #6",target:"purchase",jp:"購入する",
+   en:"I honestly feel that every purchase we make is a small vote for the kind of world we want to live in.",
+   ja:"私たちが行うすべての購入は、自分が生きたい世界への小さな投票だと正直感じています。"},
+  {label:"でる度A #7",target:"occur",jp:"起きる",
+   en:"Do you think it is possible to prevent serious accidents from occurring in the workplace?",
+   ja:"職場での重大な事故が起きるのを防ぐことは可能だと思いますか？"},
+  {label:"でる度A #8",target:"deal",jp:"対処する",
+   en:"Have you ever had to deal with a situation where everyone around you was wrong but you were afraid to speak up?",
+   ja:"周りの全員が間違っているのに、声を上げるのが怖かった状況に対処しなければならなかったことはありますか？"},
+  {label:"でる度A #9",target:"consume",jp:"消費する",
+   en:"Have you ever stopped to think about how much energy you consume in a single day?",
+   ja:"一日にどれだけのエネルギーを消費しているか、立ち止まって考えたことはありますか？"},
+  {label:"でる度A #10",target:"present",jp:"提示する",
+   en:"I really believe that the way you present your ideas matters just as much as the ideas themselves.",
+   ja:"アイデアを提示する方法は、アイデアそのものと同じくらい重要だと強く思います。"},
+  {label:"でる度A #11",target:"fire",jp:"解雇する",
+   en:"Do you think a company has the right to fire an employee without giving any clear reason?",
+   ja:"明確な理由を示さずに従業員を解雇する権利が会社にあると思いますか？"},
+  {label:"でる度A #12",target:"regard",jp:"みなす",
+   en:"Do you think she regards her own failures as valuable lessons rather than reasons to give up?",
+   ja:"彼女は自分の失敗を諦める理由ではなく、貴重な教訓としてみなしていると思いますか？"},
+  {label:"でる度A #13",target:"fine",jp:"罰金を科す",
+   en:"I honestly think it is fair to fine companies heavily when they knowingly damage the natural environment.",
+   ja:"企業が故意に自然環境を破壊した場合、重い罰金を科すことは公正だと正直思います。"},
+  {label:"でる度A #14",target:"transfer",jp:"移す",
+   en:"Have you ever had to transfer to a completely new school or workplace and felt utterly lost at first?",
+   ja:"全く新しい学校や職場に転校・転勤し、最初は完全に途方に暮れたことはありますか？"},
+  {label:"でる度A #15",target:"decline",jp:"減少する",
+   en:"Have you noticed that the number of independent bookstores has continued to decline in recent years?",
+   ja:"近年、独立系書店の数が減少し続けているのに気づいていますか？"},
+  {label:"でる度A #16",target:"eliminate",jp:"取り除く",
+   en:"I really wish we could eliminate the kind of systemic bias that holds talented people back from reaching their potential.",
+   ja:"才能ある人々が可能性を発揮するのを妨げる組織的な偏見を取り除くことができればと強く思います。"},
+  {label:"でる度A #17",target:"indicate",jp:"示す",
+   en:"Do you think the choices she makes in her daily life indicate what she truly values most deeply?",
+   ja:"彼女が日常生活で行う選択は、彼女が最も深く大切にしているものを示していると思いますか？"},
+  {label:"でる度A #18",target:"ensure",jp:"確実にする",
+   en:"I really think it is our responsibility to ensure that future generations inherit a healthy planet.",
+   ja:"将来の世代が健全な地球を受け継げるよう確実にするのが私たちの責任だと、強く思います。"},
+  {label:"でる度A #19",target:"expand",jp:"広げる",
+   en:"I honestly believe that travel has the power to expand your sense of what is possible in your own life.",
+   ja:"旅行は自分の人生で何が可能かという感覚を広げる力を持っていると正直信じています。"},
+  {label:"でる度A #20",target:"address",jp:"取り組む",
+   en:"Have you ever felt frustrated that leaders refuse to address the real causes of a problem and only treat the symptoms?",
+   ja:"リーダーたちが問題の真の原因に取り組もうとせず、症状だけを治療することに苛立ちを感じたことはありますか？"},
+  {label:"でる度A #21",target:"identify",jp:"特定する",
+   en:"Do you think you could identify the exact moment when you first became truly passionate about something?",
+   ja:"何かに初めて本当に情熱を持った瞬間を正確に特定できると思いますか？"},
+  {label:"でる度A #22",target:"construct",jp:"建設する",
+   en:"I really think that the stories we tell ourselves are the walls and windows that construct the reality we live in.",
+   ja:"私たちが自分に語る物語は、私たちが生きる現実を建設する壁と窓だと強く思います。"},
+  {label:"でる度A #23",target:"invest",jp:"投資する",
+   en:"Do you think she is willing to invest enough time and emotional energy into building truly meaningful relationships?",
+   ja:"彼女は本当に意味のある人間関係を築くために、十分な時間と感情的エネルギーを投資する意欲があると思いますか？"},
+  {label:"でる度A #24",target:"obtain",jp:"取得する",
+   en:"I honestly feel that the hardest things to obtain in life are not money or status but genuine peace of mind.",
+   ja:"人生で取得するのが最も難しいものは、お金や地位ではなく本物の心の平和だと正直感じています。"},
+  {label:"でる度A #25",target:"struggle",jp:"奮闘する",
+   en:"Have you ever watched someone you love struggle silently for years before finally asking for the help they needed?",
+   ja:"愛する人が何年も声を上げずに奮闘してから、ようやく必要な助けを求めるのを見たことはありますか？"},
+  {label:"でる度A #26",target:"counter",jp:"反論する",
+   en:"I really admire people who have the courage to counter popular opinion when they genuinely believe it is wrong.",
+   ja:"本当に間違っていると信じるとき、大衆の意見に反論する勇気を持つ人を心から尊敬します。"},
+  {label:"でる度A #27",target:"associate",jp:"連想する",
+   en:"Do you think she will always associate the smell of rain with a particular memory from her childhood?",
+   ja:"彼女は雨の匂いを、幼少期のある特定の記憶と常に連想するでしょうか？"},
+  {label:"でる度A #28",target:"register",jp:"登録する",
+   en:"I honestly think more young people would register to vote if they truly believed their voice could change things.",
+   ja:"自分の声が物事を変えられると本当に信じるなら、もっと多くの若者が選挙人登録をすると正直思います。"},
+  {label:"でる度A #29",target:"reveal",jp:"明らかにする",
+   en:"Do you think social media platforms should be required to reveal how their algorithms influence what we see?",
+   ja:"SNSプラットフォームはアルゴリズムが私たちの見るものにどう影響するかを明らかにすることを義務付けられるべきだと思いますか？"},
+  {label:"でる度A #30",target:"species",jp:"種",
+   en:"Have you ever felt a profound sadness knowing that an entire species has disappeared from the earth forever?",
+   ja:"ある種が地球から永遠に消えたと知ったとき、深い悲しみを感じたことはありますか？"},
+  {label:"でる度A #31",target:"diet",jp:"食事",
+   en:"I really believe that a balanced diet is not just about physical health but also about how clearly you think and feel.",
+   ja:"バランスの取れた食事は身体的な健康だけでなく、思考と感情の明晰さにも関わると強く信じています。"},
+  {label:"でる度A #32",target:"site",jp:"場所",
+   en:"Do you think she ever visits the site where something important happened in her life just to feel connected to it again?",
+   ja:"彼女は人生で重要な出来事が起きた場所を、再びつながりを感じるために訪れることがあると思いますか？"},
+  {label:"でる度A #33",target:"cell",jp:"細胞",
+   en:"Do you think that understanding how a single cell functions could revolutionize the way we treat disease?",
+   ja:"単一の細胞がどのように機能するかを理解することが、病気の治療方法に革命をもたらすと思いますか？"},
+  {label:"でる度A #34",target:"facility",jp:"施設",
+   en:"I honestly think that every community deserves access to a safe, well-maintained facility where people can gather and support each other.",
+   ja:"すべての地域社会には、人々が集まり支え合える安全で手入れの行き届いた施設へのアクセスが必要だと正直思います。"},
+  {label:"でる度A #35",target:"practice",jp:"慣習",
+   en:"Have you ever questioned a long-standing practice in your family or culture and wondered whether it still makes sense today?",
+   ja:"家族や文化における長年の慣習に疑問を持ち、今日でもまだ意味があるかと考えたことはありますか？"},
+  {label:"でる度A #36",target:"resident",jp:"居住者",
+   en:"I really feel that every resident of a city deserves to have a say in the decisions that shape their daily environment.",
+   ja:"都市のすべての居住者は、日常環境を形作る決定に発言権を持つべきだと強く感じています。"},
+  {label:"でる度A #37",target:"option",jp:"選択肢",
+   en:"Do you think young people today have more or fewer meaningful career options than previous generations did?",
+   ja:"今日の若者は以前の世代よりも意味のある職業の選択肢が多いと思いますか、それとも少ないと思いますか？"},
+  {label:"でる度A #38",target:"organ",jp:"臓器",
+   en:"Do you think she has ever seriously considered registering as an organ donor and what that decision truly means?",
+   ja:"彼女は臓器提供者として登録することを真剣に考え、その決断が本当に何を意味するかを考えたことがあると思いますか？"},
+  {label:"でる度A #39",target:"critic",jp:"批評家",
+   en:"I honestly think that being your own harshest critic can be both your greatest strength and your most exhausting weakness.",
+   ja:"自分自身の最も厳しい批評家であることは、最大の強さでもあり最も疲弊させる弱さでもあると正直思います。"},
+  {label:"でる度A #40",target:"region",jp:"地域",
+   en:"Have you ever traveled to a region so different from your own that it made you question everything you assumed was normal?",
+   ja:"自分の地域とあまりにも異なる地域を旅して、当たり前だと思っていたすべてのことを疑わせられたことはありますか？"},
+  {label:"でる度A #41",target:"tax",jp:"税金",
+   en:"Do you think that wealthy individuals and corporations should pay significantly higher tax rates than they currently do?",
+   ja:"裕福な個人と企業は現在よりも大幅に高い税金を支払うべきだと思いますか？"},
+  {label:"でる度A #42",target:"access",jp:"利用の機会",
+   en:"I really believe that unequal access to quality education is one of the deepest injustices in our society today.",
+   ja:"質の高い教育への不平等なアクセスは、今日の社会における最も深い不正義の一つだと強く信じています。"},
+  {label:"でる度A #43",target:"virus",jp:"ウイルス",
+   en:"Do you think she fully understood how quickly a virus could reshape the entire way society functions until she lived through it?",
+   ja:"実際に経験するまで、ウイルスが社会の機能全体をいかに速く再形成できるかを彼女は完全に理解していたと思いますか？"},
+  {label:"でる度A #44",target:"bill",jp:"請求書",
+   en:"I honestly feel a quiet anxiety every time a medical bill arrives that reminds me how fragile financial security truly is.",
+   ja:"医療の請求書が届くたびに、経済的な安心がいかに脆いかを思い知らされる静かな不安を正直感じます。"},
+  {label:"でる度A #45",target:"evidence",jp:"証拠",
+   en:"Do you think there is sufficient evidence to conclude that climate change is primarily caused by human activity?",
+   ja:"気候変動が主に人間の活動によって引き起こされているという結論を導くのに十分な証拠があると思いますか？"},
+  {label:"でる度A #46",target:"attempt",jp:"試み",
+   en:"I honestly admire anyone who makes a genuine attempt to learn a new language as an adult.",
+   ja:"大人になって新しい言語を学ぼうという真剣な試みをする人を、私は正直心から尊敬します。"},
+  {label:"でる度A #47",target:"account",jp:"口座",
+   en:"Have you ever checked your bank account and felt that the number there said something painful about the choices you had made?",
+   ja:"銀行口座を確認して、その数字が自分が行った選択について何か辛いことを語っていると感じたことはありますか？"},
+  {label:"でる度A #48",target:"theory",jp:"理論",
+   en:"I really think that a theory which cannot be tested against real human experience is of very limited value in the end.",
+   ja:"実際の人間の経験に対して検証できない理論は、結局のところ非常に限られた価値しかないと強く思います。"},
+  {label:"でる度A #49",target:"factor",jp:"要因",
+   en:"Do you think that early childhood environment is the single most important factor in shaping who a person becomes?",
+   ja:"幼少期の環境が、人がどんな人間になるかを形成する上で最も重要な要因だと思いますか？"},
+  {label:"でる度A #50",target:"stock",jp:"在庫",
+   en:"Do you think she ever worries that she is slowly running out of the emotional stock she needs to keep giving to others?",
+   ja:"他者に与え続けるために必要な感情的な在庫が徐々に尽きていくことを、彼女は心配することがあると思いますか？"},
+  {label:"でる度A #51",target:"chemical",jp:"化学的な",
+   en:"Do you think that chemical additives in processed foods pose a genuine long-term health risk to consumers?",
+   ja:"加工食品の化学的な添加物は消費者に長期的な健康リスクをもたらすと思いますか？"},
+  {label:"でる度A #52",target:"media",jp:"メディア",
+   en:"I honestly feel that the media has a responsibility to present the truth even when it is uncomfortable.",
+   ja:"不快であっても真実を伝えるのはメディアの責任だと、正直思います。"},
+  {label:"でる度A #53",target:"income",jp:"所得",
+   en:"I honestly believe that a person's income should never determine the quality of healthcare or education they receive.",
+   ja:"人の所得が受ける医療や教育の質を決して決定すべきではないと正直信じています。"},
+  {label:"でる度A #54",target:"supply",jp:"供給",
+   en:"I really think that ensuring a stable supply of clean water should be a top priority for every government.",
+   ja:"清潔な水の安定した供給を確保することはすべての政府の最優先事項であるべきだと、強く思います。"},
+  {label:"でる度A #55",target:"shortage",jp:"不足",
+   en:"Have you ever lived through a shortage of something you always took for granted and felt genuine gratitude afterward?",
+   ja:"当たり前だと思っていたものの不足を経験し、その後本物の感謝の気持ちを感じたことはありますか？"},
+  {label:"でる度A #56",target:"poverty",jp:"貧困",
+   en:"I really think that no child should be born into poverty in a world that produces more than enough for everyone.",
+   ja:"全員に十分以上のものを生産する世界で、貧困の中に生まれる子供がいるべきではないと強く思います。"},
+  {label:"でる度A #57",target:"criminal",jp:"犯人",
+   en:"Do you think she believes that a criminal can genuinely change and deserve a second chance to live a meaningful life?",
+   ja:"犯人は本当に変わることができ、意味のある人生を生きる第二のチャンスに値すると彼女は信じていると思いますか？"},
+  {label:"でる度A #58",target:"budget",jp:"予算",
+   en:"I honestly feel that the way a government chooses to spend its budget reveals more about its true values than any speech ever could.",
+   ja:"政府が予算をどのように使うかは、いかなるスピーチよりも政府の真の価値観をより多く明らかにすると正直感じています。"},
+  {label:"でる度A #59",target:"authority",jp:"当局",
+   en:"Have you ever felt torn between trusting the authority of experts and following your own deeply held instincts?",
+   ja:"専門家の当局を信頼することと、自分の深く持つ本能に従うことの間で引き裂かれたことはありますか？"},
+  {label:"でる度A #60",target:"genome",jp:"ゲノム",
+   en:"I really think that understanding the human genome is one of the most profound scientific achievements of our generation.",
+   ja:"人間のゲノムを理解することは、私たちの世代の最も深遠な科学的成果の一つだと強く思います。"},
+  {label:"でる度A #61",target:"atmosphere",jp:"雰囲気",
+   en:"Do you think she can sense the atmosphere in a room the moment she walks in and adjust herself accordingly?",
+   ja:"彼女は部屋に入った瞬間にその雰囲気を感じ取り、それに合わせて自分を調整できると思いますか？"},
+  {label:"でる度A #62",target:"aid",jp:"援助",
+   en:"I honestly believe that genuine aid should empower people to build their own futures rather than create dependence.",
+   ja:"本物の援助は依存を生み出すのではなく、人々が自分自身の未来を築く力を与えるべきだと正直信じています。"},
+  {label:"でる度A #63",target:"measure",jp:"措置",
+   en:"Have you ever wished that those in power would take stronger measures to protect the people who are most vulnerable in society?",
+   ja:"権力を持つ人々が社会で最も脆弱な人々を守るためにより強力な措置を取ってほしいと思ったことはありますか？"},
+  {label:"でる度A #64",target:"subject",jp:"被験者",
+   en:"I really feel uncomfortable with the idea of using human beings as subjects in experiments without their fully informed consent.",
+   ja:"完全な情報に基づく同意なしに人間を実験の被験者として使うという考えに、強く不快感を覚えます。"},
+  {label:"でる度A #65",target:"decade",jp:"10年間",
+   en:"Do you think she realizes how much she has changed over the past decade and whether she is proud of who she has become?",
+   ja:"彼女は過去10年間でどれほど変わったか、そして自分がなった人物を誇りに思うかどうかを理解していると思いますか？"},
+  {label:"でる度A #66",target:"weapon",jp:"兵器",
+   en:"I honestly think that kindness used with wisdom and courage can be the most powerful weapon against hatred and division.",
+   ja:"知恵と勇気を持って使われる優しさは、憎しみと分断に対する最も強力な兵器になり得ると正直思います。"},
+  {label:"でる度A #67",target:"nutrient",jp:"栄養分",
+   en:"Have you ever paid close attention to the nutrient content of your food and been surprised by how little value some meals have?",
+   ja:"食品の栄養分の内容に注意を払って、一部の食事が実際にはいかに栄養価が低いかに驚いたことはありますか？"},
+  {label:"でる度A #68",target:"expense",jp:"出費",
+   en:"I really believe that the greatest expense in life is not money but the time and energy we spend on things that do not matter.",
+   ja:"人生における最大の出費はお金ではなく、重要でないことに費やす時間とエネルギーだと強く信じています。"},
+  {label:"でる度A #69",target:"structure",jp:"建造物",
+   en:"Do you think she finds meaning in visiting ancient structures that connect her to people who lived thousands of years before her?",
+   ja:"何千年も前に生きた人々とつながる古代の建造物を訪れることに、彼女は意味を見出すと思いますか？"},
+  {label:"でる度A #70",target:"adolescent",jp:"青年",
+   en:"I honestly think that the pain an adolescent feels is often dismissed too quickly by adults who have forgotten how intense it was.",
+   ja:"青年が感じる痛みは、それがいかに強烈だったかを忘れた大人によってあまりにも早く退けられることが多いと正直思います。"},
+  {label:"でる度A #71",target:"procedure",jp:"手順",
+   en:"Have you ever followed every procedure perfectly and still felt that something essential was missing from the outcome?",
+   ja:"すべての手順を完璧に踏んでも、結果に何か本質的なものが欠けていると感じたことはありますか？"},
+  {label:"でる度A #72",target:"minimum",jp:"最低限",
+   en:"I honestly think that meeting only the minimum requirement in life is a quiet way of telling yourself you are not worth more.",
+   ja:"人生で最低限の要件だけを満たすことは、自分にはそれ以上の価値がないと静かに自分に言い聞かせる方法だと正直思います。"},
+  {label:"でる度A #73",target:"fuel",jp:"燃料",
+   en:"Do you think she understands that resentment, left unaddressed, can fuel a kind of slow destruction from within?",
+   ja:"対処されないままの恨みは、内側からゆっくりとした破壊の燃料になり得ることを彼女は理解していると思いますか？"},
+  {label:"でる度A #74",target:"resource",jp:"資源",
+   en:"I really believe that time is the one resource that, once spent, can never be recovered no matter how much wealth you accumulate.",
+   ja:"時間はどれほど富を蓄積しても、一度使ったら決して取り戻せない唯一の資源だと強く信じています。"},
+  {label:"でる度A #75",target:"regulation",jp:"規制",
+   en:"Have you ever felt that a regulation designed to protect people ended up making their lives more complicated and difficult instead?",
+   ja:"人々を守るために作られた規制が、かえって彼らの生活をより複雑で困難にしていると感じたことはありますか？"},
+  {label:"でる度A #76",target:"contract",jp:"契約書",
+   en:"I honestly feel that no contract can truly capture the depth of trust that makes a real partnership work over time.",
+   ja:"どんな契約書も、本物のパートナーシップを長期にわたって機能させる信頼の深さを真に捉えることはできないと正直感じています。"},
+  {label:"でる度A #77",target:"insurance",jp:"保険",
+   en:"Do you think she ever resents paying for insurance she never uses while knowing others desperately need it and cannot afford it?",
+   ja:"彼女は決して使わない保険料を払いながら、他の人が切実に必要としているのに払えないことを知って憤りを感じることがあると思いますか？"},
+  {label:"でる度A #78",target:"employment",jp:"雇用",
+   en:"I really think that meaningful employment gives people far more than just income — it gives them a sense of dignity and purpose.",
+   ja:"意味のある雇用は収入だけでなく、尊厳と目的意識を人々に与えると強く思います。"},
+  {label:"でる度A #79",target:"ban",jp:"禁止",
+   en:"Have you ever felt conflicted about a ban on something you personally enjoy because you understand why it protects others?",
+   ja:"他の人を守る理由は理解しながらも、自分が楽しんでいるものの禁止について複雑な気持ちになったことはありますか？"},
+  {label:"でる度A #80",target:"vehicle",jp:"車",
+   en:"I honestly believe that the vehicle you drive says something about how you balance personal desire with responsibility to the planet.",
+   ja:"あなたが運転する車は、個人的な欲求と地球への責任のバランスをどのように取るかについて何かを語っていると正直信じています。"},
+  {label:"でる度A #81",target:"soil",jp:"土",
+   en:"Do you think she feels a deep connection to the soil of the place where she grew up even after living far away for years?",
+   ja:"何年も遠くに住んでいても、彼女は育った場所の土に深いつながりを感じると思いますか？"},
+  {label:"でる度A #82",target:"cargo",jp:"貨物",
+   en:"I really think that every ship carrying cargo across the ocean is also quietly carrying the hopes of people on both ends of the journey.",
+   ja:"海を渡る貨物を積んだすべての船は、旅の両端にいる人々の希望も静かに運んでいると強く思います。"},
+  {label:"でる度A #83",target:"aircraft",jp:"航空機",
+   en:"Have you ever sat alone on an aircraft high above the clouds and felt strangely free from every problem waiting for you on the ground?",
+   ja:"雲の上高くで航空機に一人で座り、地上で待つすべての問題から不思議と解放された気分になったことはありますか？"},
+  {label:"でる度A #84",target:"current",jp:"現在の",
+   en:"I honestly think that your current circumstances do not define your future unless you allow them to become your only story.",
+   ja:"現在の状況は、それを唯一の物語にしてしまわない限り、あなたの未来を定義しないと正直思います。"},
+  {label:"でる度A #85",target:"political",jp:"政治の",
+   en:"Do you think she finds it exhausting to navigate the political tension that surfaces even in ordinary conversations among friends?",
+   ja:"友人同士の普通の会話にも表れる政治的な緊張を乗り越えることに、彼女は疲れを感じると思いますか？"},
+  {label:"でる度A #86",target:"significant",jp:"重要な",
+   en:"I really believe that the most significant changes in a person's life often begin with a single quiet decision made alone.",
+   ja:"人の人生における最も重要な変化は、一人で行われた一つの静かな決断から始まることが多いと強く信じています。"},
+  {label:"でる度A #87",target:"effective",jp:"効果的な",
+   en:"Have you ever discovered that the most effective approach to a problem was the simplest one you had been overlooking all along?",
+   ja:"問題への最も効果的なアプローチが、ずっと見落としていた最もシンプルなものだったと気づいたことはありますか？"},
+  {label:"でる度A #88",target:"military",jp:"軍隊の",
+   en:"I honestly think that those who have never experienced military service often misunderstand both its costs and its profound bonds.",
+   ja:"軍隊の経験をしたことがない人は、その代償と深い絆の両方をしばしば誤解していると正直思います。"},
+  {label:"でる度A #89",target:"due",jp:"支払期日",
+   en:"Do you think she feels the weight of everything due in her life — deadlines, obligations, expectations — and wonders when it ends?",
+   ja:"締め切り、義務、期待など、人生で支払期日が来るすべての重みを感じ、それがいつ終わるかと思うことがあると思いますか？"},
+  {label:"でる度A #90",target:"essential",jp:"不可欠な",
+   en:"I really think that silence is essential for anyone who wants to hear the quiet voice of their own deepest intuition.",
+   ja:"自分の最も深い直感の静かな声を聞きたい人にとって、沈黙は不可欠だと強く思います。"},
+  {label:"でる度A #91",target:"illegal",jp:"違法の",
+   en:"Have you ever wondered whether something being illegal automatically makes it wrong, or whether law and ethics are truly the same thing?",
+   ja:"違法であることが自動的に間違いを意味するのか、それとも法律と倫理は本当に同じものなのかと疑問に思ったことはありますか？"},
+  {label:"でる度A #92",target:"immune",jp:"免疫を持つ",
+   en:"I honestly believe that no one is truly immune to loneliness, not even those who always appear to be surrounded by people.",
+   ja:"常に人に囲まれているように見える人でさえ、誰も孤独に真に免疫を持っているわけではないと正直信じています。"},
+  {label:"でる度A #93",target:"numerous",jp:"非常に数の多い",
+   en:"Do you think she is aware of the numerous small kindnesses others have shown her that she may have forgotten over time?",
+   ja:"彼女は、時間とともに忘れてしまったかもしれない他者からの非常に数の多い小さな親切に気づいていると思いますか？"},
+  {label:"でる度A #94",target:"extreme",jp:"極端な",
+   en:"I really think that people who hold extreme views are often expressing a deep fear that more moderate voices have failed to address.",
+   ja:"極端な見解を持つ人は、穏健な声が対処できなかった深い恐怖を表現していることが多いと強く思います。"},
+  {label:"でる度A #95",target:"general",jp:"一般的な",
+   en:"Have you ever noticed that general advice often sounds wise until you actually try to apply it to your specific complicated situation?",
+   ja:"一般的なアドバイスは、自分の具体的な複雑な状況に実際に適用しようとするまでは賢明に聞こえることに気づいたことはありますか？"},
+  {label:"でる度A #96",target:"agricultural",jp:"農業の",
+   en:"I honestly believe that agricultural communities hold a kind of wisdom about patience and cycles that urban life tends to erase.",
+   ja:"農業の地域社会は、都市生活が消し去りがちな忍耐とサイクルについての一種の知恵を持っていると正直信じています。"},
+  {label:"でる度A #97",target:"overall",jp:"全体的な",
+   en:"Do you think she ever steps back to assess the overall direction of her life and honestly asks whether she is heading somewhere meaningful?",
+   ja:"彼女は自分の人生の全体的な方向性を評価するために一歩引き、意味のある場所に向かっているかどうかを正直に自問することがあると思いますか？"},
+  {label:"でる度A #98",target:"additional",jp:"追加の",
+   en:"I really feel that asking for additional support when you are struggling is a sign of wisdom, not weakness.",
+   ja:"苦しんでいるときに追加の支援を求めることは、弱さではなく知恵の証だと強く感じています。"},
+  {label:"でる度A #99",target:"entire",jp:"全体の",
+   en:"Have you ever given your entire self to a relationship or a dream and then had to figure out who you were without it?",
+   ja:"関係や夢に自分の全体を捧げてから、それなしで自分が誰なのかを考えなければならなかったことはありますか？"},
+  {label:"でる度A #100",target:"severe",jp:"ひどい",
+   en:"I honestly think that severe criticism delivered without compassion rarely changes behavior and instead just hardens resistance.",
+   ja:"思いやりなく与えられるひどい批判は、行動をほとんど変えず、代わりに抵抗を強化するだけだと正直思います。"},
+  {label:"でる度A #101",target:"alter",jp:"変える",
+   en:"Do you think she realizes that every experience she has, however small, will alter who she is in ways she cannot fully predict?",
+   ja:"どんなに小さな経験でも、彼女は完全には予測できない形で自分を変えることに彼女は気づいていると思いますか？"},
+  {label:"でる度A #102",target:"adopt",jp:"採用する",
+   en:"I really believe that the courage to adopt a completely new perspective is one of the greatest gifts you can give yourself.",
+   ja:"全く新しい視点を採用する勇気は、自分自身に与えられる最大の贈り物の一つだと強く信じています。"},
+  {label:"でる度A #103",target:"vote",jp:"投票する",
+   en:"Have you ever stood in a voting booth and felt the strange weight of choosing between imperfect options that all matter deeply?",
+   ja:"投票所に立って、すべてが深く重要な不完全な選択肢の中から選ぶ奇妙な重みを感じたことはありますか？"},
+  {label:"でる度A #104",target:"determine",jp:"決定する",
+   en:"I honestly think that the questions we choose to ask determine the quality of the answers and the life we end up living.",
+   ja:"私たちが選ぶ質問が、答えの質と最終的に生きる人生の質を決定すると正直思います。"},
+  {label:"でる度A #105",target:"enable",jp:"できるようにする",
+   en:"Do you think she believes that financial independence will enable her to finally make choices based purely on meaning rather than necessity?",
+   ja:"経済的な独立が、必要性ではなく純粋に意味に基づいた選択をついにできるようにすると彼女は信じていると思いますか？"},
+  {label:"でる度A #106",target:"conduct",jp:"実施する",
+   en:"I really feel that the way we conduct ourselves in small, unobserved moments reveals our true character more than any public act.",
+   ja:"人目のない小さな瞬間に自分をどのように振る舞うかは、どんな公の行為よりも真の人格を明らかにすると強く感じています。"},
+  {label:"でる度A #107",target:"direct",jp:"案内する",
+   en:"Have you ever had a mentor who could direct you toward your own strengths in ways you had never seen them yourself?",
+   ja:"自分自身では気づかなかった形で、あなたを自分の強みへと案内してくれたメンターがいたことはありますか？"},
+  {label:"でる度A #108",target:"absorb",jp:"吸収する",
+   en:"I honestly think that children absorb not just the words their parents say but the emotions those words are wrapped in.",
+   ja:"子供は親が言う言葉だけでなく、その言葉が包まれた感情も吸収すると正直思います。"},
+  {label:"でる度A #109",target:"imply",jp:"ほのめかす",
+   en:"Do you think she understands that what people do not say can sometimes imply far more than anything they choose to express openly?",
+   ja:"人が言わないことは、公に表現することよりもはるかに多くをほのめかすことがあると彼女は理解していると思いますか？"},
+  {label:"でる度A #110",target:"operate",jp:"操作する",
+   en:"I really think society needs more transparency about how algorithms operate and influence our daily choices.",
+   ja:"アルゴリズムがどのように操作され私たちの日常的な選択に影響を与えるかについて、社会にはより多くの透明性が必要だと強く思います。"},
+  {label:"でる度A #111",target:"demonstrate",jp:"実演する",
+   en:"I really believe the most powerful way to demonstrate your values is not through words but through the choices you make daily.",
+   ja:"自分の価値観を実演する最も強力な方法は言葉ではなく、日々の選択だと強く信じています。"},
+  {label:"でる度A #112",target:"boost",jp:"増加させる",
+   en:"Have you ever found that a single encouraging word from the right person at the right moment could boost your confidence entirely?",
+   ja:"適切な瞬間に適切な人からの一言の励ましが、自信を完全に増加させることがあると気づいたことはありますか？"},
+  {label:"でる度A #113",target:"prove",jp:"判明する",
+   en:"I honestly think that the moments when you feel most alone can prove to be the ones that shape you most profoundly.",
+   ja:"最も孤独に感じる瞬間が、あなたを最も深く形作る瞬間であると判明することがあると正直思います。"},
+  {label:"でる度A #114",target:"monitor",jp:"監視する",
+   en:"Do you think she ever feels uneasy knowing that so many aspects of her digital life are being monitored without her full awareness?",
+   ja:"デジタルライフの多くの側面が十分な認識なしに監視されていることを知って、彼女は不安を感じることがあると思いますか？"},
+  {label:"でる度A #115",target:"defeat",jp:"打ち破る",
+   en:"I really believe that the only way to truly defeat fear is to walk directly toward it rather than waiting for it to disappear.",
+   ja:"恐怖を真に打ち破る唯一の方法は、それが消えるのを待つのではなく、直接それに向かって歩くことだと強く信じています。"},
+  {label:"でる度A #116",target:"protest",jp:"抗議する",
+   en:"Have you ever felt the urge to protest against something you knew was wrong but stayed silent out of fear of the consequences?",
+   ja:"間違っていると知りながら、結果を恐れて沈黙したまま何かに抗議したい衝動を感じたことはありますか？"},
+  {label:"でる度A #117",target:"target",jp:"対象にする",
+   en:"I honestly think it is deeply unfair when vulnerable communities are consistently targeted by policies designed to benefit those already powerful.",
+   ja:"すでに力のある人々を利益にする政策によって、脆弱なコミュニティが一貫して対象にされることは非常に不公平だと正直思います。"},
+  {label:"でる度A #118",target:"preserve",jp:"保護する",
+   en:"Do you think she feels a personal responsibility to preserve the stories and memories of older generations before they are lost forever?",
+   ja:"彼女は、永遠に失われる前に古い世代の物語と記憶を保護する個人的な責任を感じていると思いますか？"},
+  {label:"でる度A #119",target:"oppose",jp:"反対する",
+   en:"I really think that learning to oppose ideas firmly while still respecting the person who holds them is one of the hardest social skills.",
+   ja:"アイデアをしっかりと反対しながらも、それを持つ人を尊重することを学ぶのは最も難しい社会的スキルの一つだと強く思います。"},
+  {label:"でる度A #120",target:"migrate",jp:"移住する",
+   en:"Have you ever imagined what it would feel like to migrate to a country where no one knows your name or your story?",
+   ja:"誰もあなたの名前や物語を知らない国に移住するとどんな感じかを想像したことはありますか？"},
+  {label:"でる度A #121",target:"analyze",jp:"分析する",
+   en:"I honestly think there is a danger in trying to analyze every emotion too carefully, because some feelings are meant to simply be felt.",
+   ja:"すべての感情を慎重に分析しようとすることには危険があります。なぜなら、ただ感じるだけでよい感情もあるからだと正直思います。"},
+  {label:"でる度A #122",target:"discourage",jp:"思いとどまらせる",
+   en:"Have you ever had someone you trusted try to discourage you from a dream that you knew deep down was right for you?",
+   ja:"深いところで自分に合っていると知っていた夢から、信頼していた人が思いとどまらせようとしたことはありますか？"},
+  {label:"でる度A #123",target:"confirm",jp:"確認する",
+   en:"I honestly think we often seek reassurance from others not to confirm facts but to quiet our own inner doubts.",
+   ja:"私たちがよく他者に安心を求めるのは、事実を確認するためではなく、内なる疑いを静めるためだと正直思います。"},
+  {label:"でる度A #124",target:"intend",jp:"意図する",
+   en:"Do you think she fully understands the gap between what she intends to do and what she actually ends up doing each day?",
+   ja:"彼女は毎日、意図することと実際に行うことの間のギャップを十分に理解していると思いますか？"},
+  {label:"でる度A #125",target:"predict",jp:"予測する",
+   en:"I really think that the hardest part of making any major decision is that no one can truly predict how their future self will feel.",
+   ja:"大きな決断を下す最も難しい部分は、未来の自分がどう感じるかを誰も真に予測できないことだと強く思います。"},
+  {label:"でる度A #126",target:"extend",jp:"延長する",
+   en:"Have you ever wished you could extend a moment of pure happiness just a little longer before life moved on?",
+   ja:"人生が続く前に、純粋な幸福の瞬間をもう少しだけ延長できればと思ったことはありますか？"},
+  {label:"でる度A #127",target:"figure",jp:"人物",
+   en:"I honestly believe that every era produces a defining figure whose courage or vision reshapes what people believe is possible.",
+   ja:"どの時代にも、その勇気やビジョンで人々が可能だと信じることを再形成する決定的な人物が現れると正直信じています。"},
+  {label:"でる度A #128",target:"transportation",jp:"交通機関",
+   en:"Do you think she ever uses long transportation journeys as a chance to simply think without distraction or obligation?",
+   ja:"彼女は長い交通機関での移動を、気晴らしや義務なしにただ考える機会として使うことがあると思いますか？"},
+  {label:"でる度A #129",target:"institution",jp:"機関",
+   en:"I really think that any institution which stops questioning itself eventually becomes the very obstacle it was created to overcome.",
+   ja:"自問することをやめたあらゆる機関は、最終的には克服するために作られた障害そのものになると強く思います。"},
+  {label:"でる度A #130",target:"theft",jp:"盗み",
+   en:"Have you ever felt that the theft of someone's time or dignity can be just as damaging as the theft of their possessions?",
+   ja:"誰かの時間や尊厳の盗みは、所有物の盗みと同じくらい傷つくことがあると感じたことはありますか？"},
+  {label:"でる度A #131",target:"candidate",jp:"候補者",
+   en:"I honestly think that the best candidate for any role is rarely the one who is most confident but rather the one who is most prepared.",
+   ja:"どんな役割においても最良の候補者は、最も自信がある人ではなく最も準備ができている人だと正直思います。"},
+  {label:"でる度A #132",target:"mammal",jp:"哺乳類",
+   en:"Do you think she ever feels a sense of kinship with other mammals and wonders what they experience in their inner lives?",
+   ja:"彼女は他の哺乳類に親近感を覚え、彼らが内面でどんな経験をしているかと思うことがあると思いますか？"},
+  {label:"でる度A #133",target:"economist",jp:"経済学者",
+   en:"I really think that even the most brilliant economist cannot fully account for the role of human emotion in financial decisions.",
+   ja:"最も優れた経済学者でさえ、金融的な決断における人間の感情の役割を完全に説明することはできないと強く思います。"},
+  {label:"でる度A #134",target:"protein",jp:"タンパク質",
+   en:"Have you ever become so focused on getting enough protein and nutrients that you forgot to simply enjoy the pleasure of eating?",
+   ja:"十分なタンパク質と栄養素を摂ることに集中しすぎて、食べることの喜びをただ楽しむことを忘れたことはありますか？"},
+  {label:"でる度A #135",target:"immigrant",jp:"移民",
+   en:"I honestly believe that every immigrant carries within them a kind of courage that those who have never left home rarely have to find.",
+   ja:"すべての移民は、故郷を離れたことのない人がほとんど見つける必要のない種類の勇気を内に持っていると正直信じています。"},
+  {label:"でる度A #136",target:"property",jp:"不動産",
+   en:"Do you think she sometimes questions whether owning property gives people a sense of belonging or just a heavier burden to carry?",
+   ja:"不動産を所有することが帰属感を与えるのか、それとも単により重い荷物を与えるだけなのかと彼女は時々疑問に思うと思いますか？"},
+  {label:"でる度A #137",target:"fund",jp:"資金",
+   en:"I really think that how we choose to fund education and healthcare says everything about what kind of society we actually want to be.",
+   ja:"教育と医療への資金調達の方法は、私たちが実際になりたい社会の種類についてすべてを語っていると強く思います。"},
+  {label:"でる度A #138",target:"habitat",jp:"生息場所",
+   en:"Have you ever visited a natural habitat so untouched and beautiful that you felt humanity had no right to disturb it?",
+   ja:"人類が乱す権利がないと感じるほど、手つかずで美しい自然の生息場所を訪れたことはありますか？"},
+  {label:"でる度A #139",target:"symptom",jp:"症状",
+   en:"I honestly believe that loneliness is often a symptom of a deeper disconnection from one's own sense of meaning and purpose.",
+   ja:"孤独はしばしば、自分自身の意味と目的意識からの深い断絶の症状だと正直信じています。"},
+  {label:"でる度A #140",target:"eruption",jp:"発生",
+   en:"Do you think she sees the eruption of anger in others as something to fear or as a signal that something important needs to be heard?",
+   ja:"他者における怒りの発生を、恐れるべきものとして見るのか、それとも重要なことが聞かれる必要があるというシグナルとして見るのかと彼女は思いますか？"},
+  {label:"でる度A #141",target:"quantity",jp:"量",
+   en:"I really think that in relationships, the quantity of time spent together matters far less than the quality of attention given.",
+   ja:"人間関係において、一緒に過ごす時間の量は与えられる注意の質よりはるかに重要ではないと強く思います。"},
+  {label:"でる度A #142",target:"ad",jp:"広告",
+   en:"Have you ever noticed how a well-crafted ad can make you feel inadequate about a life that was perfectly fine moments before?",
+   ja:"巧みに作られた広告が、直前まで十分に良かった人生について不十分に感じさせることに気づいたことはありますか？"},
+  {label:"でる度A #143",target:"saving",jp:"節約",
+   en:"I honestly feel that the real value of saving money is not the security it provides but the freedom it quietly makes possible.",
+   ja:"お金の節約の本当の価値は、それが提供する安心感ではなく、それが静かに可能にする自由だと正直感じています。"},
+  {label:"でる度A #144",target:"territory",jp:"領土",
+   en:"Do you think she ever feels that her personal boundaries are a kind of emotional territory worth protecting from those who do not respect them?",
+   ja:"彼女は自分の個人的な境界を、尊重しない人から守る価値のある感情的な領土のように感じることがあると思いますか？"},
+  {label:"でる度A #145",target:"threat",jp:"脅威",
+   en:"I really believe that the greatest threat to our freedom is not outside force but the gradual acceptance of our own diminishment.",
+   ja:"自由への最大の脅威は外からの力ではなく、自分自身が小さくなることを徐々に受け入れることだと強く信じています。"},
+  {label:"でる度A #146",target:"sufferer",jp:"苦しむ人",
+   en:"Have you ever wished you could do more to ease the pain of a sufferer you love but felt helpless in the face of their struggle?",
+   ja:"愛する苦しむ人の痛みを和らげたいと思いながらも、彼らの苦しみの前で無力に感じたことはありますか？"},
+  {label:"でる度A #147",target:"emission",jp:"排出",
+   en:"I honestly think that reducing carbon emission is not just an environmental issue but a profound moral obligation to future generations.",
+   ja:"二酸化炭素の排出を削減することは、環境問題だけでなく将来の世代への深い道徳的義務だと正直思います。"},
+  {label:"でる度A #148",target:"executive",jp:"幹部",
+   en:"Do you think she ever wonders whether the executive who made a decision that hurt thousands of people truly understood the human cost?",
+   ja:"何千人もの人々を傷つけた決断を下した幹部が、その人的コストを本当に理解していたかどうかと彼女は思うことがあると思いますか？"},
+  {label:"でる度A #149",target:"strategy",jp:"戦略",
+   en:"I really think the most important strategy in life is knowing when to persist and when to change direction completely.",
+   ja:"人生における最も重要な戦略は、いつ粘り続け、いつ完全に方向を変えるかを知ることだと強く思います。"},
+  {label:"でる度A #150",target:"riot",jp:"暴動",
+   en:"Have you ever tried to understand what drives people to riot and found that desperation and unheard voices are almost always at the root?",
+   ja:"人々を暴動に駆り立てるものを理解しようとして、絶望と聞かれない声がほぼ常に根底にあると気づいたことはありますか？"},
+  {label:"でる度A #151",target:"district",jp:"地域",
+   en:"I honestly feel that growing up in a disadvantaged district should never determine the ceiling of what a child can dream or achieve.",
+   ja:"恵まれない地域で育つことが、子供が夢見たり達成したりできることの上限を決して決定すべきではないと正直感じています。"},
+  {label:"でる度A #152",target:"election",jp:"選挙",
+   en:"Do you think she truly believes that one election can change the direction of a nation, or does she feel the system runs deeper than that?",
+   ja:"一度の選挙が国の方向を変えられると彼女は本当に信じているのか、それともシステムはそれよりも深いところで動いていると感じているのかと思いますか？"},
+  {label:"でる度A #153",target:"medication",jp:"薬",
+   en:"I really think that finding the right medication for mental health is an act of courage, not a sign of giving up on yourself.",
+   ja:"精神的健康のための適切な薬を見つけることは、自分を諦めるサインではなく、勇気ある行為だと強く思います。"},
+  {label:"でる度A #154",target:"breed",jp:"品種",
+   en:"Have you ever wondered what it means that humans have shaped entire breed of animals to suit our needs over thousands of years?",
+   ja:"何千年もかけて、私たちのニーズに合わせて動物の品種全体を人間が形作ってきたことが何を意味するかと思ったことはありますか？"},
+  {label:"でる度A #155",target:"conflict",jp:"衝突",
+   en:"I honestly believe that every unresolved conflict we carry inside us eventually finds a way to surface in our closest relationships.",
+   ja:"内に抱えたすべての未解決の衝突は、最終的に最も親密な関係の中に浮かび上がる方法を見つけると正直信じています。"},
+  {label:"でる度A #156",target:"productivity",jp:"生産性",
+   en:"Do you think she ever questions whether her obsession with productivity is helping her live fully or preventing her from simply being?",
+   ja:"生産性への執着が完全に生きることを助けているのか、それともただ存在することを妨げているのかと彼女は疑問に思うことがあると思いますか？"},
+  {label:"でる度A #157",target:"organism",jp:"有機体",
+   en:"I really think that a city, like a living organism, is only as healthy as its most neglected and vulnerable parts.",
+   ja:"都市は生きた有機体のように、最も放置され脆弱な部分と同じくらいしか健全ではないと強く思います。"},
+  {label:"でる度A #158",target:"representative",jp:"代表者",
+   en:"Have you ever felt that your elected representative had completely forgotten what it felt like to live the life of the people they serve?",
+   ja:"選出された代表者が、自分が仕える人々の生活がどんな感じかを完全に忘れていると感じたことはありますか？"},
+  {label:"でる度A #159",target:"warehouse",jp:"倉庫",
+   en:"I honestly think that some people use busyness as a warehouse to store all the feelings they are not yet ready to face.",
+   ja:"一部の人は、まだ向き合う準備ができていないすべての感情を保管する倉庫として多忙さを使っていると正直思います。"},
+  {label:"でる度A #160",target:"refund",jp:"返金",
+   en:"Do you think she ever wishes she could receive a refund for the years she spent trying to be someone she was never meant to be?",
+   ja:"彼女はなることを意図されていなかった誰かになろうとして過ごした年月の返金を受けられればと思うことがあると思いますか？"},
+  {label:"でる度A #161",target:"tuition",jp:"授業料",
+   en:"I really think that the rising cost of tuition is silently closing the door of opportunity on an entire generation of talented young people.",
+   ja:"授業料の上昇コストは、才能ある若者の世代全体の機会の扉を静かに閉じていると強く思います。"},
+  {label:"でる度A #162",target:"range",jp:"範囲",
+   en:"Have you ever been surprised by the range of emotions you could feel within a single hour — from grief to joy to numbness?",
+   ja:"悲しみから喜び、そして無感覚まで、たった1時間以内に感じることができる感情の範囲に驚いたことはありますか？"},
+  {label:"でる度A #163",target:"victim",jp:"被害者",
+   en:"I honestly believe that refusing to see yourself as a victim, even when you have been wronged, is one of the most powerful choices you can make.",
+   ja:"不当な扱いを受けていても、自分を被害者と見ることを拒否することは、あなたができる最も強力な選択の一つだと正直信じています。"},
+  {label:"でる度A #164",target:"dose",jp:"服用量",
+   en:"Do you think she understands that even a small dose of genuine encouragement can sometimes be enough to change the entire trajectory of a life?",
+   ja:"本物の励ましのほんの少しの服用量が、時に人生の軌道全体を変えるのに十分なことがあると彼女は理解していると思いますか？"},
+  {label:"でる度A #165",target:"mainland",jp:"本土",
+   en:"I really think that people who grew up on islands often develop a relationship with isolation and self-reliance that mainland dwellers rarely understand.",
+   ja:"島で育った人々は、本土の住人がほとんど理解しない孤立と自立との関係をしばしば育てると強く思います。"},
+  {label:"でる度A #166",target:"waterfall",jp:"滝",
+   en:"Have you ever stood before a powerful waterfall and felt both completely small and strangely alive at the same time?",
+   ja:"強力な滝の前に立って、完全に小さくなりながらも奇妙に生きていると同時に感じたことはありますか？"},
+  {label:"でる度A #167",target:"satellite",jp:"人工衛星",
+   en:"I honestly find it remarkable that a satellite launched decades ago is still traveling silently through space, long after its creators have passed.",
+   ja:"数十年前に打ち上げられた人工衛星が、その作り手たちが亡くなった後も、宇宙を静かに旅し続けていることは驚くべきことだと正直思います。"},
+  {label:"でる度A #168",target:"evolution",jp:"進化",
+   en:"Do you think she sees her own personal growth as a kind of evolution, shaped not by design but by the pressures she has survived?",
+   ja:"彼女は自分の個人的な成長を、設計によってではなく乗り越えてきた圧力によって形作られた一種の進化として見ていると思いますか？"},
+  {label:"でる度A #169",target:"prey",jp:"獲物",
+   en:"I really think that kind and trusting people should never be made to feel like prey simply because they chose to believe in others.",
+   ja:"優しく信頼する人々は、他者を信じることを選んだだけで獲物のように感じさせられるべきではないと強く思います。"},
+  {label:"でる度A #170",target:"bystander",jp:"傍観者",
+   en:"Have you ever been a bystander in a moment that required courage to act and wished afterward that you had found the strength to step in?",
+   ja:"行動する勇気が必要な場面の傍観者になり、後から踏み出す強さを持てばよかったと思ったことはありますか？"},
+  {label:"でる度A #171",target:"creature",jp:"生き物",
+   en:"I honestly believe that every living creature deserves to exist without suffering imposed upon it by human indifference or cruelty.",
+   ja:"すべての生き物は、人間の無関心や残酷さによって課される苦しみなしに存在する権利があると正直信じています。"},
+  {label:"でる度A #172",target:"civilization",jp:"文明",
+   en:"Have you ever stood among ancient ruins and felt the full weight of how fragile every civilization ultimately is?",
+   ja:"古代の遺跡の中に立って、すべての文明が最終的にいかに脆いかという重みを全身で感じたことはありますか？"},
+  {label:"でる度A #173",target:"tribe",jp:"部族",
+   en:"I really think that every person needs a tribe — a small group of people who truly see them and refuse to let them disappear.",
+   ja:"すべての人は部族が必要だと強く思います。本当に自分を見て、消えることを拒否してくれる小さなグループです。"},
+  {label:"でる度A #174",target:"permission",jp:"許可",
+   en:"Do you think she is still waiting for permission from others to pursue the life she has always known she deserved?",
+   ja:"彼女はまだ、自分が常にふさわしいと知っていた人生を追求するための他者からの許可を待っていると思いますか？"},
+  {label:"でる度A #175",target:"barrier",jp:"障壁",
+   en:"I honestly believe that the most stubborn barrier between people is not language or distance but the unwillingness to truly listen.",
+   ja:"人々の間で最も頑固な障壁は、言語や距離ではなく、真に聞こうとしない意志の欠如だと正直信じています。"},
+  {label:"でる度A #176",target:"wage",jp:"賃金",
+   en:"Have you ever felt the quiet indignity of working full days and still earning a wage too low to live on with any real dignity?",
+   ja:"丸一日働いても、本当の尊厳を持って生きるには低すぎる賃金しか稼げないという静かな屈辱を感じたことはありますか？"},
+  {label:"でる度A #177",target:"drone",jp:"ドローン",
+   en:"I really think that the rise of the drone in modern life raises profound questions about privacy, surveillance, and what it means to be observed.",
+   ja:"現代生活におけるドローンの台頭は、プライバシー、監視、そして観察されることの意味について深刻な疑問を提起すると強く思います。"},
+  {label:"でる度A #178",target:"appearance",jp:"外見",
+   en:"Do you think she has ever struggled to reconcile the appearance she shows the world with the person she truly feels she is inside?",
+   ja:"彼女は世界に見せる外見と、内側で本当に感じている自分を一致させることに苦しんだことがあると思いますか？"},
+  {label:"でる度A #179",target:"embassy",jp:"大使館",
+   en:"I honestly find it fascinating that an embassy represents a small piece of one country existing quietly inside another.",
+   ja:"大使館があるの国の小さな一部が別の国の中に静かに存在することを表しているということが、興味深いと正直思います。"},
+  {label:"でる度A #180",target:"skeleton",jp:"骨格",
+   en:"Have you ever thought about how the skeleton of your beliefs was formed in childhood and how hard it is to reshape even one bone?",
+   ja:"信念の骨格が幼少期に形成され、たった一本の骨を作り直すことさえいかに難しいかを考えたことはありますか？"},
+  {label:"でる度A #181",target:"wildlife",jp:"野生生物",
+   en:"I really believe that our willingness to protect wildlife is one of the truest measures of our capacity for compassion beyond ourselves.",
+   ja:"野生生物を守る意志は、自分を超えた思いやりの能力の最も真の尺度の一つだと強く信じています。"},
+  {label:"でる度A #182",target:"potential",jp:"潜在的な",
+   en:"Do you think she sometimes grieves the potential she feels she has not yet fully lived up to, and wonders if it is too late?",
+   ja:"彼女はまだ十分に発揮していないと感じる潜在能力を時々悼み、手遅れかどうかと思うことがあると思いますか？"},
+  {label:"でる度A #183",target:"limited",jp:"限られた",
+   en:"I honestly think that having limited time and resources forces a clarity of purpose that abundance rarely teaches.",
+   ja:"限られた時間と資源を持つことは、豊かさがほとんど教えてくれない目的の明確さを強いると正直思います。"},
+  {label:"でる度A #184",target:"rural",jp:"田舎の",
+   en:"Have you ever spent time in a rural community and felt a slower, quieter rhythm of life that made you question your usual pace?",
+   ja:"田舎のコミュニティで時間を過ごし、普段のペースを疑わせる、よりゆっくりと静かな生活のリズムを感じたことはありますか？"},
+  {label:"でる度A #185",target:"advanced",jp:"進歩した",
+   en:"I really think that the most advanced societies are not those with the best technology but those that treat their most vulnerable members with the most care.",
+   ja:"最も進歩した社会は、最高の技術を持つ社会ではなく、最も脆弱なメンバーを最も丁重に扱う社会だと強く思います。"},
+  {label:"でる度A #186",target:"beneficial",jp:"有益な",
+   en:"Do you think she finds solitude genuinely beneficial, or does she secretly fear what she might discover about herself in the silence?",
+   ja:"彼女は孤独を本当に有益だと感じているのか、それとも沈黙の中で自分について発見するかもしれないことを密かに恐れているのかと思いますか？"},
+  {label:"でる度A #187",target:"genetic",jp:"遺伝子の",
+   en:"I honestly wonder whether understanding our genetic predispositions frees us from them or simply gives us more to worry about.",
+   ja:"遺伝子の傾向を理解することが、それらから解放してくれるのか、それとも単に心配することを増やすだけなのかと正直疑問に思います。"},
+  {label:"でる度A #188",target:"radical",jp:"根本的な",
+   en:"Have you ever realized that what feels like a radical idea today is often simply the common sense of tomorrow?",
+   ja:"今日は根本的なアイデアに感じることが、しばしば明日の常識に過ぎないことに気づいたことはありますか？"},
+  {label:"でる度A #189",target:"hostile",jp:"敵意のある",
+   en:"I really think that when someone becomes hostile, they are often expressing a pain so deep they have forgotten how else to speak.",
+   ja:"誰かが敵意のある態度を取るとき、彼らはしばしば他にどう話せばいいか忘れてしまうほど深い痛みを表現していると強く思います。"},
+  {label:"でる度A #190",target:"fit",jp:"健康な",
+   en:"Do you think she truly believes that staying fit is about loving her body, or does she secretly still use exercise to punish herself?",
+   ja:"健康でいることは体を愛することだと彼女は本当に信じているのか、それとも密かにまだ運動を自分を罰するために使っているのかと思いますか？"},
+  {label:"でる度A #191",target:"long-term",jp:"長期にわたる",
+   en:"I honestly think that most of our regrets come from choosing short-term comfort over long-term meaning.",
+   ja:"ほとんどの後悔は、長期にわたる意味よりも短期的な快楽を選ぶことから来ると正直思います。"},
+  {label:"でる度A #192",target:"Arctic",jp:"北極の",
+   en:"Have you ever read about the Arctic and felt both awe at its beauty and grief at how rapidly we are allowing it to disappear?",
+   ja:"北極について読んで、その美しさへの畏敬と、いかに急速にそれを消失させているかへの悲しみを同時に感じたことはありますか？"},
+  {label:"でる度A #193",target:"minor",jp:"軽い",
+   en:"I really believe that what seems like a minor act of kindness to the giver can feel enormous and life-changing to the one who receives it.",
+   ja:"与える側には軽い親切に見えることが、受け取る側には巨大で人生を変えるものに感じられることがあると強く信じています。"},
+  {label:"でる度A #194",target:"risky",jp:"危険な",
+   en:"Do you think she understands that playing it safe can sometimes be the most risky choice of all, because it forecloses so many possibilities?",
+   ja:"安全策を取ることは、非常に多くの可能性を閉ざすため、時に最も危険な選択になり得ることを彼女は理解していると思いますか？"},
+  {label:"でる度A #195",target:"complex",jp:"複雑な",
+   en:"I honestly feel that our hunger for simple answers is what makes us most vulnerable in a genuinely complex world.",
+   ja:"単純な答えへの欲求が、本当に複雑な世界で私たちを最も脆弱にするものだと正直感じています。"},
+  {label:"でる度A #196",target:"competitive",jp:"競争力のある",
+   en:"Have you ever worked in an environment so competitive that it slowly eroded your ability to celebrate someone else's success?",
+   ja:"あまりにも競争力のある環境で働いて、他者の成功を喜ぶ能力がゆっくりと失われていったことはありますか？"},
+  {label:"でる度A #197",target:"immediate",jp:"即座の",
+   en:"I really think the pressure for immediate results prevents us from investing in the slow, deep work that actually transforms things.",
+   ja:"即座の結果への圧力が、実際に物事を変革する遅くて深い仕事への投資を妨げると強く思います。"},
+  {label:"でる度A #198",target:"religious",jp:"宗教上の",
+   en:"Do you think she respects religious traditions that are very different from her own upbringing, or does she quietly struggle with their meaning?",
+   ja:"彼女は自分の育ちとは非常に異なる宗教上の伝統を尊重しているのか、それともその意味に静かに苦しんでいるのかと思いますか？"},
+  {label:"でる度A #199",target:"related",jp:"関連した",
+   en:"I honestly think that nearly every problem we face in society is related to some deeper failure of empathy and connection.",
+   ja:"社会で直面するほぼすべての問題は、共感とつながりのより深い失敗に関連していると正直思います。"},
+  {label:"でる度A #200",target:"affordable",jp:"手頃な",
+   en:"Have you ever felt the quiet shame of something being unaffordable that everyone around you seemed to access without a second thought?",
+   ja:"周りの誰もが何も考えずに利用しているように見えるものが手頃でないときの静かな恥を感じたことはありますか？"},
+  {label:"でる度A #201",target:"donate",jp:"寄付をする",
+   en:"I really believe that when we donate not from obligation but from genuine love, both the giver and receiver are transformed.",
+   ja:"義務からではなく本物の愛から寄付をするとき、与える側と受け取る側の両方が変わると強く信じています。"},
+  {label:"でる度A #202",target:"lessen",jp:"減らす",
+   en:"Do you think she has found anything that consistently helps to lessen the anxiety she carries with her most days?",
+   ja:"彼女はほとんどの日々に抱えている不安を一貫して減らすのに役立つものを見つけたと思いますか？"},
+  {label:"でる度A #203",target:"manufacture",jp:"生産する",
+   en:"I honestly think that our ability to manufacture convenience has quietly manufactured a generation unable to tolerate discomfort.",
+   ja:"利便性を生産する私たちの能力が、不快感に耐えられない世代を静かに生産してしまったと正直思います。"},
+  {label:"でる度A #204",target:"commute",jp:"通勤する",
+   en:"Have you ever used your daily commute as the only quiet space you had to think, decompress, or simply be alone with yourself?",
+   ja:"毎日の通勤を、考えたり、緊張をほぐしたり、ただ自分一人でいられる唯一の静かなスペースとして使ったことはありますか？"},
+  {label:"でる度A #205",target:"exaggerate",jp:"誇張する",
+   en:"I really think we often exaggerate our own suffering in our minds and underestimate the resources we actually have to face it.",
+   ja:"私たちはしばしば心の中で自分の苦しみを誇張し、実際に向き合うための持っているリソースを過小評価すると強く思います。"},
+  {label:"でる度A #206",target:"suspect",jp:"疑わしく思う",
+   en:"Do you think she would suspect kindness from a stranger, or has she kept enough openness to receive it with genuine gratitude?",
+   ja:"彼女は見知らぬ人からの親切を疑わしく思うのか、それとも本物の感謝を持って受け取るだけの開放性を保っているのかと思いますか？"},
+  {label:"でる度A #207",target:"acquire",jp:"習得する",
+   en:"I honestly believe that the skills most worth having are rarely those we acquire quickly but those we wrestle with for years.",
+   ja:"持つ価値が最も高いスキルは、素早く習得するものではなく、何年もかけて取り組むものであることが多いと正直信じています。"},
+  {label:"でる度A #208",target:"reintroduce",jp:"再導入する",
+   en:"Have you ever thought about what it would mean to reintroduce a lost species into a landscape and give it a second chance at existence?",
+   ja:"絶滅した種を景観に再導入し、存在への第二のチャンスを与えることが何を意味するかを考えたことはありますか？"},
+  {label:"でる度A #209",target:"reschedule",jp:"日時の変更をする",
+   en:"I really think that our habit of constantly reschedule things we find difficult reveals more about our fears than our calendars.",
+   ja:"難しいと感じることを常に日時の変更をする習慣は、カレンダーよりも私たちの恐れについてより多くを明らかにすると強く思います。"},
+  {label:"でる度A #210",target:"adapt",jp:"適応する",
+   en:"Do you think she admires the way some people seem to adapt to almost any situation without losing their core sense of self?",
+   ja:"ほとんどどんな状況にも自分の本質的な自己感覚を失わずに適応するように見える人の在り方を彼女は尊敬していると思いますか？"},
+  {label:"でる度A #211",target:"generate",jp:"生み出す",
+   en:"I honestly believe that genuine curiosity can generate more meaningful learning than any structured system of education ever designed.",
+   ja:"本物の好奇心は、これまでに設計されたどんな構造化された教育システムよりも意味のある学習を生み出すことができると正直信じています。"},
+  {label:"でる度A #212",target:"guarantee",jp:"保障する",
+   en:"Have you ever wished life could guarantee that the effort you put in would always lead to the outcome you were hoping for?",
+   ja:"注いだ努力が常に望む結果につながることを人生が保障してくれればと思ったことはありますか？"},
+  {label:"でる度A #213",target:"dump",jp:"投棄する",
+   en:"I really think it says something troubling about us that we continue to dump our problems — chemical, emotional, industrial — onto future generations.",
+   ja:"化学的、感情的、工業的な問題を将来の世代に投棄し続けることは、私たち自身について不穏なことを示していると強く思います。"},
+  {label:"でる度A #214",target:"update",jp:"最新のものにする",
+   en:"Do you think she takes time to regularly update the beliefs she formed in her youth and examine whether they still hold up?",
+   ja:"彼女は若い頃に形成した信念を定期的に最新のものにして、今でも通用するかどうかを検討する時間を取っていると思いますか？"},
+  {label:"でる度A #215",target:"classify",jp:"分類する",
+   en:"I honestly think our urge to classify and categorize other people often blinds us to the complexity that makes them human.",
+   ja:"他者を分類し区分化しようとする衝動が、しばしば人間としての彼らの複雑さへの視野を塞ぐと正直思います。"},
+  {label:"でる度A #216",target:"acknowledge",jp:"認める",
+   en:"Have you ever found that simply having someone acknowledge your pain — without trying to fix it — was exactly what you needed?",
+   ja:"痛みを直そうとせず、ただ誰かが認めてくれるだけで、まさに必要なものだったと気づいたことはありますか？"},
+  {label:"でる度A #217",target:"enforce",jp:"遵守させる",
+   en:"I really believe it is not enough to have good laws; what matters most is the will and consistency with which we enforce them.",
+   ja:"良い法律を持つだけでは十分ではなく、最も重要なのはそれらを遵守させる意志と一貫性だと強く信じています。"},
+  {label:"でる度A #218",target:"renew",jp:"再開する",
+   en:"Do you think she feels the need to renew her sense of purpose from time to time, or does she carry a steady inner direction?",
+   ja:"彼女は時々目的意識を再開する必要を感じているのか、それとも安定した内なる方向性を持っているのかと思いますか？"},
+  {label:"でる度A #219",target:"overlook",jp:"見逃す",
+   en:"I honestly think that we most often overlook the beauty in our lives precisely because it is constant and familiar.",
+   ja:"私たちが最も頻繁に見逃すのは、まさにそれが一定で親しみ深いからこそ、人生の美しさだと正直思います。"},
+  {label:"でる度A #220",target:"evaluate",jp:"評価する",
+   en:"Have you ever had to evaluate your own performance honestly and felt the discomfort of seeing yourself more clearly than you expected?",
+   ja:"自分のパフォーマンスを正直に評価しなければならず、期待以上に自分自身がはっきり見えることの不快感を感じたことはありますか？"},
+  {label:"でる度A #221",target:"commit",jp:"を犯す",
+   en:"I really believe that most people who commit harmful acts are not monsters but ordinary people who stopped questioning themselves.",
+   ja:"有害な行為を犯すほとんどの人は怪物ではなく、自問することをやめてしまった普通の人々だと強く信じています。"},
+  {label:"でる度A #222",target:"argument",jp:"議論",
+   en:"Have you ever won an argument and felt strangely hollow afterward, as if being right had cost you something more important?",
+   ja:"議論に勝ってから、正しかったことが何かより大切なものを犠牲にしたかのように、奇妙に空虚に感じたことはありますか？"},
+  {label:"でる度A #223",target:"archaeologist",jp:"考古学者",
+   en:"I really think that every archaeologist who uncovers a forgotten life is performing an act of profound respect for human existence.",
+   ja:"忘れられた命を掘り起こすすべての考古学者は、人間の存在への深い敬意の行為をしていると強く思います。"},
+  {label:"でる度A #224",target:"reputation",jp:"評判",
+   en:"Do you think she worries that her reputation is being shaped by people who have never taken the time to truly understand her?",
+   ja:"彼女の評判が、彼女を真に理解する時間を取ったことのない人々によって形成されていることを彼女は心配していると思いますか？"},
+  {label:"でる度A #225",target:"fossil",jp:"化石",
+   en:"I honestly feel a strange wonder that a fossil can survive for millions of years while the living creature it once was vanished so quickly.",
+   ja:"かつてあった生き物がそれほど速く消えたのに、化石が何百万年も生き残れるという奇妙な驚きを正直感じます。"},
+  {label:"でる度A #226",target:"status",jp:"地位",
+   en:"Have you ever noticed how quickly people treat you differently the moment your professional status changes, in either direction?",
+   ja:"専門的な地位がどちらの方向でも変わった瞬間に、人々がいかに素早く違う扱いをするかに気づいたことはありますか？"},
+  {label:"でる度A #227",target:"contrast",jp:"対比",
+   en:"I really think that experiencing great sadness in contrast with great joy teaches you something about the full depth of being human.",
+   ja:"大きな喜びとの対比で大きな悲しみを経験することは、人間であることの完全な深みについて何かを教えてくれると強く思います。"},
+  {label:"でる度A #228",target:"workplace",jp:"職場",
+   en:"Do you think she has ever felt that the culture of her workplace slowly began to reshape who she was outside of it as well?",
+   ja:"職場の文化が、その外での自分自身も徐々に再形成し始めたと彼女は感じたことがあると思いますか？"},
+  {label:"でる度A #229",target:"equality",jp:"平等",
+   en:"I honestly believe that true equality is not about making everyone the same but about ensuring that no one is invisible or left behind.",
+   ja:"真の平等は全員を同じにすることではなく、誰も見えなくならず取り残されないことを確保することだと正直信じています。"},
+  {label:"でる度A #230",target:"colleague",jp:"同僚",
+   en:"Have you ever had a colleague whose quiet encouragement changed the entire experience of a job you were about to give up on?",
+   ja:"諦めようとしていた仕事の経験全体を変えた同僚の静かな励ましがあったことはありますか？"},
+  {label:"でる度A #231",target:"assistance",jp:"手助け",
+   en:"I really think that offering assistance without being asked, at exactly the right moment, is one of the highest forms of attentiveness.",
+   ja:"求められることなく、まさに適切な瞬間に手助けを申し出ることは、最高の気配りの形の一つだと強く思います。"},
+  {label:"でる度A #232",target:"luxury",jp:"贅沢",
+   en:"Do you think she considers uninterrupted time for thought and reflection to be a genuine luxury in her current life?",
+   ja:"彼女は思考と内省のための邪魔されない時間を、現在の生活における本物の贅沢とみなしていると思いますか？"},
+  {label:"でる度A #233",target:"outbreak",jp:"突発",
+   en:"I honestly think that every disease outbreak reveals not just a biological failure but the social inequalities that determine who is most at risk.",
+   ja:"すべての病気の突発は、生物学的な失敗だけでなく、誰が最もリスクにさらされているかを決定する社会的不平等を明らかにすると正直思います。"},
+  {label:"でる度A #234",target:"council",jp:"議会",
+   en:"Have you ever attended a local council meeting and been struck by both how much ordinary citizens care and how powerless they often feel?",
+   ja:"地元の議会の会議に出席し、一般市民がいかに気にかけているかと、いかに無力に感じることが多いかの両方に驚いたことはありますか？"},
+  {label:"でる度A #235",target:"pottery",jp:"陶器",
+   en:"I really think there is something deeply meditative about making pottery — the way your hands and the material negotiate a shape together.",
+   ja:"陶器を作ることには深く瞑想的な何かがあります。手と素材が一緒に形を交渉する方法には、と強く思います。"},
+  {label:"でる度A #236",target:"assessment",jp:"評価",
+   en:"Do you think she is capable of making an honest assessment of her own weaknesses without falling into either denial or harsh self-judgment?",
+   ja:"彼女は否定にも厳しい自己批判にも陥ることなく、自分の弱点を正直に評価することができると思いますか？"},
+  {label:"でる度A #237",target:"particle",jp:"微粒子",
+   en:"I honestly find it remarkable that the same particle of matter can exist in entirely different forms depending on how it is arranged.",
+   ja:"同じ微粒子が、どのように配置されているかによって全く異なる形で存在できることが、驚くべきだと正直思います。"},
+  {label:"でる度A #238",target:"radiation",jp:"放射線",
+   en:"Have you ever thought about how invisibly radiation surrounds us in daily life, and how little we understand its long-term effects?",
+   ja:"日常生活でいかに目に見えない形で放射線が私たちを囲んでいるか、そしてその長期的な影響をいかに少しか理解していないかを考えたことはありますか？"},
+  {label:"でる度A #239",target:"priority",jp:"優先",
+   en:"I really think that what we list as a priority and what we actually prioritize with our time are often two entirely different things.",
+   ja:"優先として挙げることと、実際に時間を使って優先することは、しばしば全く異なることだと強く思います。"},
+  {label:"でる度A #240",target:"content",jp:"内容",
+   en:"Do you think she is genuinely content with her life, or does she sometimes sense a quiet restlessness she has not yet found words for?",
+   ja:"彼女は本当に自分の人生に満足しているのか、それとも時々まだ言葉が見つかっていない静かな落ち着きのなさを感じているのかと思いますか？"},
+  {label:"でる度A #241",target:"destination",jp:"目的地",
+   en:"I honestly believe that the journey changes you far more than the destination, and the person who arrives is never quite the one who left.",
+   ja:"旅は目的地よりもはるかにあなたを変え、到着した人は出発した人とは少し違うと正直信じています。"},
+  {label:"でる度A #242",target:"mine",jp:"鉱山",
+   en:"Have you ever read about the conditions in a mine and felt the weight of what goes into the products we casually consume every day?",
+   ja:"鉱山の状況について読んで、私たちが毎日何気なく消費する製品に何が込められているかの重みを感じたことはありますか？"},
+  {label:"でる度A #243",target:"injury",jp:"怪我",
+   en:"I really think that some of the most significant injury we carry through life are the invisible ones inflicted in childhood.",
+   ja:"人生を通じて抱える最も重要な怪我の中には、幼少期に与えられた目に見えないものがあると強く思います。"},
+  {label:"でる度A #244",target:"lottery",jp:"宝くじ",
+   en:"Do you think she ever reflects on how much of her life's circumstances were simply the lottery of where and to whom she was born?",
+   ja:"彼女の人生の状況の多くが、単純にどこでどんな親に生まれたかという宝くじだったかを、彼女は時々振り返ることがあると思いますか？"},
+  {label:"でる度A #245",target:"feature",jp:"特徴",
+   en:"I honestly think the feature of a person that others often criticize is sometimes the very same quality that makes them extraordinary.",
+   ja:"他者がよく批判する人の特徴は、時にその人を並外れた存在にしているまさに同じ質であることがあると正直思います。"},
+  {label:"でる度A #246",target:"labor",jp:"労働",
+   en:"Have you ever felt deep respect for the labor of someone whose work you had previously taken entirely for granted?",
+   ja:"以前は当然のこととして受け取っていた誰かの労働に、深い敬意を感じたことはありますか？"},
+  {label:"でる度A #247",target:"diabetes",jp:"糖尿病",
+   en:"I really think that the global rise of diabetes tells us something important about the kind of environment and food systems we have built.",
+   ja:"世界的な糖尿病の増加は、私たちが構築した環境と食料システムの種類について重要なことを教えてくれると強く思います。"},
+  {label:"でる度A #248",target:"bulb",jp:"電球",
+   en:"Do you think she has ever noticed how the light from a single bulb can transform the mood of a room and the way people speak to each other?",
+   ja:"一つの電球からの光が、部屋の雰囲気と人々が互いに話す方法を変えることに彼女は気づいたことがあると思いますか？"},
+  {label:"でる度A #249",target:"résumé",jp:"履歴書",
+   en:"I honestly think that the person behind a résumé is almost always far richer and stranger and more interesting than any document can capture.",
+   ja:"履歴書の背後にいる人は、どんな書類でも捉えることができるよりも、ほぼ常にはるかに豊かで奇妙で面白いと正直思います。"},
+  {label:"でる度A #250",target:"mud",jp:"泥",
+   en:"Have you ever been completely stuck in the mud of a situation you created yourself and had to find the patience to slowly work your way out?",
+   ja:"自分で作り出した状況の泥に完全にはまり込み、ゆっくりと抜け出す忍耐を見つけなければならなかったことはありますか？"},
+  {label:"でる度A #251",target:"psychology",jp:"心理学",
+   en:"I really believe that a basic understanding of psychology should be taught to every young person as one of the most essential life skills.",
+   ja:"心理学の基本的な理解は、最も不可欠な人生スキルの一つとして、すべての若者に教えられるべきだと強く信じています。"},
+  {label:"でる度A #252",target:"corporation",jp:"大企業",
+   en:"Do you think she trusts that any corporation genuinely acts in the public interest, or does she believe profit will always come first?",
+   ja:"いかなる大企業も本当に公益のために行動すると彼女は信頼しているのか、それとも利益が常に最優先されると信じているのかと思いますか？"},
+  {label:"でる度A #253",target:"ecosystem",jp:"生態系",
+   en:"I honestly think that understanding how fragile an ecosystem truly is would change the way most people vote and consume.",
+   ja:"生態系が本当にどれほど脆いかを理解すれば、ほとんどの人の投票や消費の仕方が変わるだろうと正直思います。"},
+  {label:"でる度A #254",target:"promotion",jp:"昇進",
+   en:"Have you ever received a promotion and felt a surprising emptiness where you expected to feel satisfaction and accomplishment?",
+   ja:"昇進して、満足感と達成感を感じると思っていたところに、驚くべき虚しさを感じたことはありますか？"},
+  {label:"でる度A #255",target:"administration",jp:"管理業務",
+   en:"I really think that the quality of any institution depends far less on its vision and far more on the unglamorous work of daily administration.",
+   ja:"いかなる機関の質も、そのビジョンよりも、日々の管理業務という地味な仕事にはるかに依存すると強く思います。"},
+  {label:"でる度A #256",target:"complaint",jp:"苦情",
+   en:"Do you think she is the kind of person who transforms a complaint into a concrete request, or does she sometimes just need to be heard?",
+   ja:"彼女は苦情を具体的な要求に変える種類の人なのか、それとも時々ただ聞いてもらうだけが必要なのかと思いますか？"},
+  {label:"でる度A #257",target:"debt",jp:"借金",
+   en:"I honestly feel that emotional debt — the unexpressed gratitude and love we owe people — can weigh on us as heavily as financial debt.",
+   ja:"感情的な借金、つまり人々に対する未表現の感謝と愛は、経済的な借金と同じくらい重く私たちにのしかかることがあると正直感じています。"},
+  {label:"でる度A #258",target:"requirement",jp:"要件",
+   en:"Have you ever felt that the requirement placed on you by others was based on who they needed you to be rather than who you actually are?",
+   ja:"他者があなたに課す要件が、あなたが実際に誰であるかではなく、彼らがあなたにどうあってほしいかに基づいていると感じたことはありますか？"},
+  {label:"でる度A #259",target:"workforce",jp:"労働人口",
+   en:"I really think that preparing the workforce for a rapidly changing economy requires much more imagination than current education systems offer.",
+   ja:"急速に変化する経済のための労働人口を準備することは、現在の教育システムが提供するよりもはるかに多くの想像力を必要とすると強く思います。"},
+  {label:"でる度A #260",target:"preference",jp:"好み",
+   en:"Do you think she has ever truly examined whether her preference for certain people or experiences reflects her values or just her comfort zone?",
+   ja:"特定の人や経験への好みが、自分の価値観を反映しているのか、それとも単なるコンフォートゾーンなのかを、彼女は本当に検討したことがあると思いますか？"},
+  {label:"でる度A #261",target:"refugee",jp:"難民",
+   en:"I honestly think that if more people heard the individual stories behind the word refugee, the political conversation would be very different.",
+   ja:"難民という言葉の背後にある個々の物語をより多くの人が聞けば、政治的な会話は大きく異なるものになるだろうと正直思います。"},
+  {label:"でる度A #262",target:"inhabitant",jp:"住人",
+   en:"Have you ever walked through an abandoned place and wondered about the lives of the inhabitant who once filled it with noise and meaning?",
+   ja:"廃墟を歩いて、かつてそこに音と意味で満ちていた住人の生活を思ったことはありますか？"},
+  {label:"でる度A #263",target:"subscription",jp:"予約購読",
+   en:"I really think that the ease of a subscription model is designed specifically to outlast our attention and our willingness to cancel it.",
+   ja:"サブスクリプションモデルの手軽さは、私たちの注意とキャンセルする意志を超えるように特別に設計されていると強く思います。"},
+  {label:"でる度A #264",target:"recipient",jp:"受取人",
+   en:"Do you think she ever wonders whether being the recipient of too much generosity can quietly undermine a person's own sense of agency?",
+   ja:"過度な寛大さの受取人になることが、人の主体性の感覚を静かに損なうことがあるかどうかと彼女は疑問に思うことがあると思いますか？"},
+  {label:"でる度A #265",target:"shift",jp:"変化",
+   en:"I honestly believe that the most profound shift in a person's life rarely comes from a dramatic event but from a single quiet realization.",
+   ja:"人の人生における最も深い変化は、劇的な出来事からではなく、一つの静かな気づきから来ることがほとんどだと正直信じています。"},
+  {label:"でる度A #266",target:"vessel",jp:"船",
+   en:"Have you ever stood at the edge of the ocean and watched a vessel disappear over the horizon and felt the pull of whatever lies beyond?",
+   ja:"海の端に立って船が地平線の向こうに消えていくのを見て、その先にあるものへの引力を感じたことはありますか？"},
+  {label:"でる度A #267",target:"ingredient",jp:"材料",
+   en:"I really think that trust is the single most essential ingredient in any relationship, and once it is truly broken, almost nothing tastes the same.",
+   ja:"信頼はいかなる関係においても最も不可欠な材料であり、一度本当に壊れると、ほとんど何も同じ味がしなくなると強く思います。"},
+  {label:"でる度A #268",target:"qualified",jp:"有能な",
+   en:"Do you think she ever doubts whether she is truly qualified for the role she is in, even when all the evidence says otherwise?",
+   ja:"すべての証拠が逆を示している場合でも、彼女は自分が就いている役割に本当に有能かどうかを疑うことがあると思いますか？"},
+  {label:"でる度A #269",target:"widespread",jp:"広範囲にわたる",
+   en:"I honestly think the widespread belief that things cannot change is one of the most powerful tools that keeps things exactly as they are.",
+   ja:"物事は変わらないという広範囲にわたる信念は、物事をまさにそのままに保つ最も強力なツールの一つだと正直思います。"},
+  {label:"でる度A #270",target:"alternative",jp:"代替の",
+   en:"Have you ever chosen an alternative path that everyone around you questioned, and found that the uncertainty itself became part of its value?",
+   ja:"周りの全員が疑問視した代替の道を選び、不確実性そのものがその価値の一部になったと気づいたことはありますか？"},
+  {label:"でる度A #271",target:"harsh",jp:"厳しい",
+   en:"I really believe that harsh truths, delivered with genuine care and at the right time, can be one of the greatest gifts one person gives another.",
+   ja:"本物の思いやりと適切なタイミングで伝えられる厳しい真実は、一人が他者に与える最大の贈り物の一つになり得ると強く信じています。"},
+  {label:"でる度A #272",target:"enormous",jp:"並外れた",
+   en:"Have you ever felt an enormous wave of gratitude wash over you for no particular reason, and simply let yourself feel it fully?",
+   ja:"特別な理由もなく並外れた感謝の波が押し寄せ、それをただ完全に感じさせたことはありますか？"},
+  {label:"でる度A #273",target:"specific",jp:"具体的な",
+   en:"I really think that most promises fail not because of bad intentions but because they were never specific enough to be acted upon.",
+   ja:"ほとんどの約束が失敗するのは、悪意があるからではなく、実行するのに十分なほど具体的でなかったからだと強く思います。"},
+  {label:"でる度A #274",target:"artificial",jp:"人工の",
+   en:"Do you think she prefers the raw unpredictability of nature to anything artificial, or does she find beauty in what humans have deliberately made?",
+   ja:"彼女は自然の生の予測不可能さを何か人工のものよりも好むのか、それとも人間が意図的に作ったものの中に美を見出すのかと思いますか？"},
+  {label:"でる度A #275",target:"toxic",jp:"有毒な",
+   en:"I honestly think that a toxic relationship does not always announce itself loudly — sometimes it whispers you are the problem.",
+   ja:"有毒な関係は常に大声で自分を知らせるわけではありません。時々、それはあなたが問題だとささやくと正直思います。"},
+  {label:"でる度A #276",target:"flexible",jp:"柔軟性のある",
+   en:"Have you ever admired how some people remain flexible in their thinking without ever losing the core values that make them who they are?",
+   ja:"一部の人が自分自身を作る核となる価値観を失わずに思考において柔軟性のある状態を保っていることに感心したことはありますか？"},
+  {label:"でる度A #277",target:"latest",jp:"最新の",
+   en:"I really think that chasing the latest trend in any field can sometimes be the fastest way to lose sight of what actually matters.",
+   ja:"どんな分野でも最新のトレンドを追いかけることは、時に実際に重要なものを見失う最速の方法になり得ると強く思います。"},
+  {label:"でる度A #278",target:"former",jp:"以前の",
+   en:"Do you think she ever looks back at her former self with compassion rather than judgment, and wonders how far she has truly come?",
+   ja:"彼女は時々、以前の自分を批判ではなく思いやりを持って振り返り、どこまで本当に来たかと思うことがあると思いますか？"},
+  {label:"でる度A #279",target:"capable",jp:"有能な",
+   en:"I honestly believe that people are far more capable than they think, but only when they are trusted enough to discover it themselves.",
+   ja:"人々は自分が思うよりもはるかに有能ですが、それは自分自身で発見するのに十分なほど信頼された場合に限ると正直信じています。"},
+  {label:"でる度A #280",target:"practical",jp:"実践的な",
+   en:"Have you ever found that the most practical solution to an emotional problem was simply giving yourself permission to feel it fully?",
+   ja:"感情的な問題への最も実践的な解決策は、それを完全に感じることを自分に許すことだと気づいたことはありますか？"},
+  {label:"でる度A #281",target:"mechanical",jp:"機械の",
+   en:"I really think that when our responses to people become mechanical, it is a sign that we have stopped truly seeing them.",
+   ja:"人々への反応が機械的になるとき、それは彼らを本当に見ることをやめたサインだと強く思います。"},
+  {label:"でる度A #282",target:"federal",jp:"連邦政府の",
+   en:"Do you think she believes that federal policy can ever truly reflect the deeply diverse needs of people living in very different circumstances?",
+   ja:"連邦政府の政策が、全く異なる状況に住む人々の深く多様なニーズを本当に反映できると彼女は信じていると思いますか？"},
+  {label:"でる度A #283",target:"aggressive",jp:"攻撃的な",
+   en:"I honestly think that people who seem aggressive in their opinions are often the ones most afraid of being fundamentally wrong.",
+   ja:"意見において攻撃的に見える人々は、しばしば根本的に間違っていることを最も恐れている人々だと正直思います。"},
+  {label:"でる度A #284",target:"adequate",jp:"十分な",
+   en:"Have you ever struggled with whether adequate was truly good enough, or whether something in you always demanded more than the minimum?",
+   ja:"十分なことが本当に良いことなのか、それとも自分の何かが常に最低限以上を求めているのかと葛藤したことはありますか？"},
+  {label:"でる度A #285",target:"unexpected",jp:"思いがけない",
+   en:"I really believe that the most unexpected conversations in the most ordinary places have sometimes changed the entire direction of my thinking.",
+   ja:"最も普通の場所での最も思いがけない会話が、時に私の思考の全方向を変えたことがあると強く信じています。"},
+  {label:"でる度A #286",target:"attractive",jp:"魅力的な",
+   en:"Do you think she finds confidence more attractive in others than physical appearance, or does she still find herself judging by what she first sees?",
+   ja:"彼女は他者において肉体的な外見よりも自信の方が魅力的だと感じているのか、それとも最初に見るものでまだ判断してしまうのかと思いますか？"},
+  {label:"でる度A #287",target:"sufficient",jp:"十分な",
+   en:"I honestly think that knowing you did your best, even if the result was not sufficient, is a kind of peace that outcomes alone cannot give you.",
+   ja:"結果が十分でなかったとしても、最善を尽くしたと知ることは、結果だけでは得られない種類の平和だと正直思います。"},
+  {label:"でる度A #288",target:"costly",jp:"費用がかかる",
+   en:"Have you ever made a decision that was not costly financially but proved extremely costly in terms of time, energy, and emotional peace?",
+   ja:"経済的には費用がかからなかったが、時間、エネルギー、感情的な平和の面で非常に費用がかかることが判明した決断をしたことはありますか？"},
+  {label:"でる度A #289",target:"eventually",jp:"結局は",
+   en:"I really think that those who keep showing up honestly and consistently will eventually be trusted in ways that shortcuts never allow.",
+   ja:"誠実に一貫して現れ続ける人々は、近道では決して許されない方法で結局は信頼されるようになると強く思います。"},
+  {label:"でる度A #290",target:"otherwise",jp:"そうでなければ",
+   en:"Do you think she acknowledges when she is wrong, or does she reframe things otherwise to protect her own sense of being right?",
+   ja:"彼女は間違っているときに認めるのか、それとも自分が正しいという感覚を守るために物事をそうでなければと再解釈するのかと思いますか？"},
+  {label:"でる度A #291",target:"previously",jp:"以前には",
+   en:"I honestly feel grateful for beliefs I previously held that turned out to be wrong, because releasing them made room for something truer.",
+   ja:"以前に持っていた信念が間違っていたことに感謝しています。なぜなら、それを手放すことがより真実なものへの場所を作ったからだと正直感じています。"},
+  {label:"でる度A #292",target:"relatively",jp:"比較的",
+   en:"Have you ever realized that a problem you were treating as a crisis was relatively minor compared to what others around you were silently enduring?",
+   ja:"危機として扱っていた問題が、周りの人々が静かに耐えていることと比較すると比較的些細なことだと気づいたことはありますか？"},
+  {label:"でる度A #293",target:"consequently",jp:"その結果",
+   en:"I really think that when we fail to listen carefully to early warning signs, we consequently pay a far greater price later.",
+   ja:"早期の警告サインを注意深く聞くことを怠ると、その結果としてはるかに大きな代価を後から払うことになると強く思います。"},
+  {label:"でる度A #294",target:"constantly",jp:"絶えず",
+   en:"Do you think she is constantly comparing her inner reality with the outer lives people display, and finding herself somehow lacking?",
+   ja:"彼女は自分の内なる現実と人々が見せる外面の生活を絶えず比較し、何か欠けていると感じていると思いますか？"},
+  {label:"でる度A #295",target:"typically",jp:"通常",
+   en:"I honestly think that what people typically say they value and how they actually spend their time rarely match as closely as they imagine.",
+   ja:"人々が通常大切にすると言うことと、実際に時間を使う方法は、想像するほど一致しないことが多いと正直思います。"},
+  {label:"でる度A #296",target:"barely",jp:"かろうじて",
+   en:"Have you ever held yourself together for so long that when someone asked if you were okay, you could barely answer before breaking down?",
+   ja:"誰かが大丈夫かと聞いたとき、崩れ落ちる前にかろうじて答えられないほど長い間自分を保ち続けたことはありますか？"},
+  {label:"でる度A #297",target:"despite",jp:"にもかかわらず",
+   en:"I really admire those who continue to give generously to others despite carrying their own heavy and unspoken burdens.",
+   ja:"自分自身の重くて口に出せない荷物を抱えているにもかかわらず、他者に惜しみなく与え続ける人を心から尊敬します。"},
+  {label:"でる度A #298",target:"per",jp:"につき",
+   en:"Do you think she ever calculates what she earns per hour of genuine happiness versus per hour of obligation, and wonders about the ratio?",
+   ja:"彼女は本当の幸福の1時間につき稼ぐものと義務の1時間につきのものを計算し、その比率について疑問に思うことがあると思いますか？"},
+  {label:"でる度A #299",target:"beneath",jp:"下に",
+   en:"I honestly believe that beneath even the most composed exterior, most people are quietly carrying something they have never told anyone.",
+   ja:"最も落ち着いた外見の下にも、ほとんどの人は誰にも話したことがない何かを静かに抱えていると正直信じています。"},
+  {label:"でる度A #300",target:"whereas",jp:"であるのに対して",
+   en:"Have you ever noticed that some people grow warmer and more open with age, whereas others seem to slowly close around their pain?",
+   ja:"年齢とともに温かく開放的になる人もいるのであるのに対して、他の人は自分の痛みを中心に徐々に閉じていくように見えることに気づいたことはありますか？"},
+  {label:"でる度A #301",target:"post",jp:"投稿する",
+   en:"I really think that the decision to post something online is often driven more by a need to be seen than a need to communicate.",
+   ja:"オンラインに何かを投稿する決断は、コミュニケーションの必要性よりも見られる必要性によって動かされることが多いと強く思います。"},
+  {label:"でる度A #302",target:"reject",jp:"拒絶する",
+   en:"Do you think she is able to reject other people's expectations of her without feeling guilty for choosing her own path instead?",
+   ja:"彼女は代わりに自分の道を選ぶことで罪悪感を感じることなく、他者の期待を拒絶することができると思いますか？"},
+  {label:"でる度A #303",target:"consult",jp:"相談する",
+   en:"I honestly think that people consult others not always for advice but often just for the experience of being listened to without judgment.",
+   ja:"人々が他者に相談するのは、必ずしもアドバイスのためではなく、判断なしに聞いてもらう経験のためであることが多いと正直思います。"},
+  {label:"でる度A #304",target:"obey",jp:"従う",
+   en:"Have you ever felt the tension between your desire to obey the rules and your sense that following them would make you complicit in something wrong?",
+   ja:"規則に従う欲求と、それに従うことで何か間違ったことに加担することになるという感覚の間の緊張を感じたことはありますか？"},
+  {label:"でる度A #305",target:"engage",jp:"従事させる",
+   en:"I really believe that the ability to engage deeply with other people's ideas without losing your own is one of the rarest intellectual gifts.",
+   ja:"自分自身を失わずに他者のアイデアに深く従事する能力は、最も稀な知的な才能の一つだと強く信じています。"},
+  {label:"でる度A #306",target:"restore",jp:"修復する",
+   en:"Do you think she believes it is ever truly possible to restore a broken trust, or does she feel that something always remains changed?",
+   ja:"壊れた信頼を本当に修復することは可能だと彼女は信じているのか、それとも何かが常に変わったままだと感じているのかと思いますか？"},
+  {label:"でる度A #307",target:"colonize",jp:"植民地化する",
+   en:"I honestly think that to colonize another people's land is to colonize their story — and that wound does not heal easily or quickly.",
+   ja:"他の民族の土地を植民地化することは、彼らの物語を植民地化することであり、その傷は簡単にも素早くも癒えないと正直思います。"},
+  {label:"でる度A #308",target:"interact",jp:"交流する",
+   en:"Have you ever noticed how differently you interact with someone depending on whether you believe they genuinely like and respect you?",
+   ja:"相手が本当に自分を好きで尊重していると思うかどうかによって、どれほど異なる形で交流するかに気づいたことはありますか？"},
+  {label:"でる度A #309",target:"inspire",jp:"奮起させる",
+   en:"I really think that the people who inspire us most are rarely those with the most extraordinary abilities but those with the most extraordinary courage.",
+   ja:"最も私たちを奮起させる人々は、最も並外れた能力を持つ人々ではなく、最も並外れた勇気を持つ人々であることがほとんどだと強く思います。"},
+  {label:"でる度A #310",target:"sue",jp:"訴える",
+   en:"Do you think she would ever sue someone she once loved deeply, or would she find a way to let go without making it a legal battle?",
+   ja:"かつて深く愛した人を訴えることがあると思いますか、それとも法的な戦いにせずに手放す方法を見つけるでしょうか？"},
+  {label:"でる度A #311",target:"estimate",jp:"推定する",
+   en:"I honestly think we consistently estimate the time and effort needed for meaningful change to be far less than reality eventually demands.",
+   ja:"意味のある変化に必要な時間と努力を、現実が最終的に要求するものよりもはるかに少なく推定し続けると正直思います。"},
+  {label:"でる度A #312",target:"strengthen",jp:"強化する",
+   en:"Have you ever gone through an experience so painful that it seemed designed to strengthen exactly the part of you that needed it most?",
+   ja:"最も必要としていた部分をまさに強化するために設計されているかのように思える、非常に辛い経験をしたことはありますか？"},
+  {label:"でる度A #313",target:"carve",jp:"彫って作る",
+   en:"I really believe that every person must carve out their own sense of purpose from the raw material of their particular life and losses.",
+   ja:"すべての人は自分の特定の人生と喪失の原材料から、自分自身の目的意識を彫って作らなければならないと強く信じています。"},
+  {label:"でる度A #314",target:"convince",jp:"説得する",
+   en:"Do you think she finds it easier to convince herself she is fine, or does she actually listen when her body and emotions say otherwise?",
+   ja:"自分は大丈夫だと自分を説得する方が簡単だと感じているのか、それとも体と感情がそうでないと言うときに実際に聞くのかと思いますか？"},
+  {label:"でる度A #315",target:"propose",jp:"提案する",
+   en:"I honestly feel that the courage it takes to propose a completely new way of doing something is deeply underestimated in most organizations.",
+   ja:"ほとんどの組織で、何かをする全く新しい方法を提案するために必要な勇気が深く過小評価されていると正直感じています。"},
+  {label:"でる度A #316",target:"blame",jp:"責任を負わせる",
+   en:"Have you ever noticed how quickly we blame others when things go wrong, and how long it takes to honestly examine our own contribution?",
+   ja:"物事がうまくいかないとき、いかに素早く責任を負わせるか、そして自分自身の貢献を正直に検討するのにいかに時間がかかるかに気づいたことはありますか？"},
+  {label:"でる度A #317",target:"collapse",jp:"崩れ落ちる",
+   en:"I really think that when something we have built with great hope and effort begins to collapse, the grief is unlike almost any other.",
+   ja:"大きな希望と努力で築いたものが崩れ落ち始めるとき、その悲しみは他のほとんどのものとは異なると強く思います。"},
+  {label:"でる度A #318",target:"import",jp:"輸入する",
+   en:"Do you think she ever considers the human stories behind the products she uses daily — who made them, where, and at what cost?",
+   ja:"彼女は毎日使う製品の背後にある人間の物語、誰が、どこで、どんな代価で作ったかを時々考えることがあると思いますか？"},
+  {label:"でる度A #319",target:"load",jp:"積む",
+   en:"I honestly believe that trying to load too much meaning into a single relationship is one of the most common ways we damage the ones we love.",
+   ja:"一つの関係に多すぎる意味を積もうとすることは、愛する人々を傷つける最も一般的な方法の一つだと正直信じています。"},
+  {label:"でる度A #320",target:"pollute",jp:"汚染する",
+   en:"Have you ever felt that spending too much time in cynical company can pollute your own sense of what is possible and worth trying?",
+   ja:"冷笑的な仲間と多すぎる時間を過ごすことが、何が可能で試す価値があるかという自分の感覚を汚染することがあると感じたことはありますか？"},
+  {label:"でる度A #321",target:"spot",jp:"場所",
+   en:"I really think that everyone needs at least one spot in the world where they feel completely themselves without needing to perform for anyone.",
+   ja:"誰もが世界に少なくとも一つ、誰かのためにパフォーマンスすることなく完全に自分自身でいられる場所が必要だと強く思います。"},
+  {label:"でる度A #322",target:"prescription",jp:"処方箋",
+   en:"Have you ever felt the quiet vulnerability of handing someone a prescription and hoping it would finally give you back some peace?",
+   ja:"処方箋を渡して、それがついに平和を取り戻してくれることを望む静かな脆さを感じたことはありますか？"},
+  {label:"でる度A #323",target:"duty",jp:"仕事",
+   en:"I really think that people who confuse duty with love often end up resenting the very people they sacrificed themselves for.",
+   ja:"義務と愛を混同する人々は、しばしば自分を犠牲にした相手を恨んでしまうことになると強く思います。"},
+  {label:"でる度A #324",target:"union",jp:"組合",
+   en:"Do you think she believes that a union between different people or ideas produces something stronger than either could be on their own?",
+   ja:"異なる人々やアイデアの組合は、どちらか単独では持てないより強いものを生み出すと彼女は信じていると思いますか？"},
+  {label:"でる度A #325",target:"concept",jp:"概念",
+   en:"I honestly think that the concept of success we inherit from our families is one of the hardest to examine and one of the most worth questioning.",
+   ja:"家族から受け継ぐ成功の概念は、検討するのが最も難しく、疑問を持つのが最も価値があるものの一つだと正直思います。"},
+  {label:"でる度A #326",target:"root",jp:"根本",
+   en:"Have you ever traced a recurring pattern in your life back to its root and felt both the pain and the relief of finally understanding it?",
+   ja:"人生の繰り返すパターンをその根本まで辿り、ついに理解した痛みと安堵の両方を感じたことはありますか？"},
+  {label:"でる度A #327",target:"survival",jp:"生き残り",
+   en:"I really believe that survival is sometimes not about strength but about the quiet refusal to stop moving even when everything says stop.",
+   ja:"生き残りとは時に強さについてではなく、すべてが止まれと言うときでも動き続けることを静かに拒否することだと強く信じています。"},
+  {label:"でる度A #328",target:"maintenance",jp:"保守点検",
+   en:"Do you think she understands that the maintenance of close relationships requires just as much deliberate care as maintaining anything else of value?",
+   ja:"親密な関係の保守点検は、他の価値あるものを維持するのと同じくらい意図的な配慮が必要だと彼女は理解していると思いますか？"},
+  {label:"でる度A #329",target:"formation",jp:"形成",
+   en:"I honestly think the formation of a person's character owes as much to what they have survived as to what they were deliberately taught.",
+   ja:"人の人格の形成は、意図的に教えられたことと同じくらい、乗り越えてきたことに負っていると正直思います。"},
+  {label:"でる度A #330",target:"educator",jp:"教育者",
+   en:"Have you ever had an educator whose belief in your potential changed what you believed was possible for yourself?",
+   ja:"あなたの可能性への信念が、あなた自身に可能だと思っていたことを変えた教育者がいたことはありますか？"},
+  {label:"でる度A #331",target:"kidney",jp:"腎臓",
+   en:"I really think that the kidney, like so many quiet organs, only receives attention when it stops doing the invisible work that keeps us alive.",
+   ja:"腎臓は、多くの静かな臓器と同様に、私たちを生かし続ける目に見えない仕事をやめたときにのみ注目されると強く思います。"},
+  {label:"でる度A #332",target:"nutrition",jp:"栄養",
+   en:"Do you think she pays as much attention to her emotional nutrition as she does to what she physically eats and drinks each day?",
+   ja:"彼女は毎日身体的に食べたり飲んだりするものと同じくらい、感情的な栄養に注意を払っていると思いますか？"},
+  {label:"でる度A #333",target:"brand",jp:"ブランド",
+   en:"I honestly think that people who define themselves too closely by a brand — whether a product or an ideology — are quietly outsourcing their identity.",
+   ja:"製品であれイデオロギーであれ、ブランドに自分を密接に定義しすぎる人々は、静かにアイデンティティを外部委託していると正直思います。"},
+  {label:"でる度A #334",target:"storage",jp:"保管",
+   en:"Have you ever realized that your mind uses worry as a form of storage for all the problems you are not yet ready to solve?",
+   ja:"心が、まだ解決する準備ができていないすべての問題の保管の形として心配を使っていることに気づいたことはありますか？"},
+  {label:"でる度A #335",target:"firm",jp:"会社",
+   en:"I really think that a firm which forgets that its people are human beings first and employees second will eventually pay a high price for that.",
+   ja:"人々がまず人間であり、次に従業員であることを忘れた会社は、やがてそれに対して高い代価を払うことになると強く思います。"},
+  {label:"でる度A #336",target:"statistics",jp:"統計",
+   en:"Do you think she trusts statistics to tell the truth, or does she know that numbers can be arranged to say almost anything we want them to?",
+   ja:"彼女は統計が真実を語ると信頼しているのか、それとも数字はほぼ私たちが言いたいことを言うように並べられると知っているのかと思いますか？"},
+  {label:"でる度A #337",target:"toll",jp:"損失",
+   en:"I honestly think that chronic stress takes a toll not just on the body but on the quality of every relationship and decision we make.",
+   ja:"慢性的なストレスは身体だけでなく、私たちが行うすべての関係と決断の質にも損失をもたらすと正直思います。"},
+  {label:"でる度A #338",target:"tip",jp:"秘訣",
+   en:"Have you ever received a simple tip that completely changed the way you approached something you had been struggling with for years?",
+   ja:"何年も苦しんでいたことへのアプローチを完全に変えたシンプルな秘訣を受け取ったことはありますか？"},
+  {label:"でる度A #339",target:"CEO",jp:"最高経営責任者",
+   en:"I really think that the best CEO is not always the most dominant person in the room but often the one who listens most carefully to the quiet voices.",
+   ja:"最良のCEOは常に部屋で最も支配的な人ではなく、しばしば静かな声に最も注意深く耳を傾ける人だと強く思います。"},
+  {label:"でる度A #340",target:"circumstance",jp:"状況",
+   en:"Do you think she truly believes that her circumstance do not define her potential, or does she sometimes feel trapped by the life she was given?",
+   ja:"状況が潜在能力を定義しないと彼女は本当に信じているのか、それとも与えられた人生に閉じ込められていると感じることがあるのかと思いますか？"},
+  {label:"でる度A #341",target:"outsider",jp:"部外者",
+   en:"I honestly believe that the outsider perspective, though often painful, is one of the greatest sources of clarity and creative insight.",
+   ja:"部外者の視点は、しばしば辛いものですが、明晰さと創造的な洞察の最大の源の一つだと正直信じています。"},
+  {label:"でる度A #342",target:"reduction",jp:"削減",
+   en:"Have you ever felt that a reduction in your responsibilities actually revealed how much of your identity had been built around staying busy?",
+   ja:"責任の削減が、どれほど多くの自分のアイデンティティが忙しくいることを中心に構築されていたかを実際に明らかにしたことはありますか？"},
+  {label:"でる度A #343",target:"settlement",jp:"開拓地",
+   en:"I really think that every settlement humans have built carries within its streets and structures the accumulated dreams and sorrows of those who came before.",
+   ja:"人間が築いたすべての開拓地は、その通りと建造物の中に、以前にやってきた人々の積み重なった夢と悲しみを持っていると強く思います。"},
+  {label:"でる度A #344",target:"divorce",jp:"離婚",
+   en:"Do you think she sees divorce as a failure, or has she come to understand it as a courageous decision to begin again more honestly?",
+   ja:"彼女は離婚を失敗として見るのか、それともより正直に再出発するための勇気ある決断として理解するようになったのかと思いますか？"},
+  {label:"でる度A #345",target:"likelihood",jp:"可能性",
+   en:"I honestly think that we dramatically overestimate the likelihood of our worst fears coming true and underestimate our ability to cope if they do.",
+   ja:"最悪の恐れが実現する可能性を劇的に過大評価し、実現した場合の対処能力を過小評価していると正直思います。"},
+  {label:"でる度A #346",target:"livestock",jp:"家畜",
+   en:"Have you ever thought seriously about the lives of livestock and felt the weight of the moral questions that come with eating meat?",
+   ja:"家畜の命について真剣に考え、肉を食べることに伴う道徳的な問いの重みを感じたことはありますか？"},
+  {label:"でる度A #347",target:"possession",jp:"所有物",
+   en:"I really think that the possession we cling to most tightly is often the one that has the least actual value and the most emotional charge.",
+   ja:"最も強く執着する所有物は、しばしば実際の価値が最も低く、感情的な重みが最も大きいものだと強く思います。"},
+  {label:"でる度A #348",target:"plot",jp:"小区画",
+   en:"Do you think she could be happy living on a small plot of land, growing her own food and living slowly, or would she feel confined?",
+   ja:"彼女は小さな小区画の土地に住み、自分の食料を育て、ゆっくり生きることで幸せになれると思いますか、それとも閉じ込められたと感じるでしょうか？"},
+  {label:"でる度A #349",target:"category",jp:"分類",
+   en:"I honestly think that every time we place a person into a category, we risk missing the one thing about them that matters most.",
+   ja:"人を分類に入れるたびに、その人について最も重要な一つのことを見逃すリスクがあると正直思います。"},
+  {label:"でる度A #350",target:"welfare",jp:"福祉",
+   en:"Have you ever felt frustrated that debates about welfare so rarely center the voices and experiences of those who actually depend on it?",
+   ja:"福祉についての議論が、実際にそれに依存する人々の声と経験をほとんど中心に置かないことに苛立ちを感じたことはありますか？"},
+  {label:"でる度A #351",target:"moisture",jp:"湿気",
+   en:"I really think there is something quietly comforting about the moisture in the air after rain — it feels like the world has just exhaled.",
+   ja:"雨の後の空気の湿気には静かに慰められるものがあります。まるで世界が息を吐いたかのように感じられると強く思います。"},
+  {label:"でる度A #352",target:"obesity",jp:"肥満",
+   en:"Do you think she approaches the issue of obesity with compassion for the complex emotional and social forces that often drive it?",
+   ja:"彼女は肥満の問題を、しばしばそれを駆り立てる複雑な感情的・社会的な力への思いやりを持って取り組んでいると思いますか？"},
+  {label:"でる度A #353",target:"grant",jp:"助成金",
+   en:"I honestly think that access to a grant at the right moment can be the difference between a meaningful idea becoming real or dying unheard.",
+   ja:"適切な瞬間の助成金へのアクセスは、意味のあるアイデアが実現するか、聞かれないまま死ぬかの違いになり得ると正直思います。"},
+  {label:"でる度A #354",target:"layer",jp:"層",
+   en:"Have you ever peeled back a layer of someone's personality and found something so unexpected and tender that it changed how you saw them entirely?",
+   ja:"誰かの人格の層を剥がして、あまりにも予想外で繊細なものを見つけ、彼らをまったく異なる目で見るようになったことはありますか？"},
+  {label:"でる度A #355",target:"secretary",jp:"秘書",
+   en:"I really think that behind almost every powerful person in history, there was a secretary who remembered everything they forgot.",
+   ja:"歴史上のほぼすべての強力な人物の背後には、彼らが忘れたすべてを覚えている秘書がいたと強く思います。"},
+  {label:"でる度A #356",target:"anxiety",jp:"不安",
+   en:"Do you think she has found a way to sit with anxiety rather than fight it, and to listen to what it might actually be trying to tell her?",
+   ja:"彼女は不安と戦うのではなく、それとともにいる方法を見つけ、それが実際に何を伝えようとしているかに耳を傾けていると思いますか？"},
+  {label:"でる度A #357",target:"ownership",jp:"所有権",
+   en:"I honestly believe that true ownership of your life begins only when you stop blaming others for the shape it has taken.",
+   ja:"人生の真の所有権は、その形を他者のせいにすることをやめたときにのみ始まると正直信じています。"},
+  {label:"でる度A #358",target:"foundation",jp:"基礎",
+   en:"Have you ever had the foundation of a belief or relationship crumble beneath you and had to find out who you were without it?",
+   ja:"信念や関係の基礎が足元で崩れ、それなしで自分が誰かを見つけなければならなかったことはありますか？"},
+  {label:"でる度A #359",target:"division",jp:"分断",
+   en:"I really think that the division we see in society today reflects not a difference in values but a failure to understand each other's fears.",
+   ja:"今日の社会で見られる分断は、価値観の違いではなく、お互いの恐れを理解する失敗を反映していると強く思います。"},
+  {label:"でる度A #360",target:"establishment",jp:"設立",
+   en:"Do you think she has ever questioned the establishment simply because it has always been there, or does she wait for real evidence of its failures?",
+   ja:"彼女はただ常にそこにあったというだけで体制に疑問を持つのか、それとも実際の失敗の証拠を待つのかと思いますか？"},
+  {label:"でる度A #361",target:"conservation",jp:"保護",
+   en:"I honestly believe that conservation is not just about saving species but about preserving our own humanity and sense of wonder.",
+   ja:"保護は種を救うだけでなく、私たち自身の人間性と驚きの感覚を保存することだと正直信じています。"},
+  {label:"でる度A #362",target:"murder",jp:"殺人",
+   en:"Have you ever tried to understand the psychology behind a murder without excusing it, and found that understanding and condoning are not the same thing?",
+   ja:"それを許すことなく殺人の背後にある心理を理解しようとして、理解することと容認することは同じではないと気づいたことはありますか？"},
+  {label:"でる度A #363",target:"presence",jp:"存在",
+   en:"I really think that the presence of someone who truly listens can heal in ways that no advice, no matter how wise, ever fully can.",
+   ja:"本当に聞いてくれる人の存在は、どんなに賢いアドバイスも完全にはできない方法で癒すことができると強く思います。"},
+  {label:"でる度A #364",target:"paradox",jp:"逆説",
+   en:"Do you think she has made peace with the paradox that you can love someone deeply and still know that you cannot build a life with them?",
+   ja:"彼女は、誰かを深く愛しながらも彼らと人生を築くことができないという逆説と折り合いをつけていると思いますか？"},
+  {label:"でる度A #365",target:"prisoner",jp:"囚人",
+   en:"I honestly think that some of the freest people in the world are those who have literally been a prisoner and decided not to let it define them.",
+   ja:"世界で最も自由な人々の一部は、文字通り囚人だったが、それに定義されないことを決意した人々だと正直思います。"},
+  {label:"でる度A #366",target:"surgeon",jp:"外科医",
+   en:"Have you ever thought about the extraordinary stillness a surgeon must find within themselves before making an incision that changes a life?",
+   ja:"外科医が人生を変える切開をする前に、自分の中に見つけなければならない並外れた静けさについて考えたことはありますか？"},
+  {label:"でる度A #367",target:"frequency",jp:"頻度",
+   en:"I really think that the frequency with which we express gratitude to the people we love says more about our character than almost anything else.",
+   ja:"愛する人々への感謝を表現する頻度は、ほとんど他の何よりも私たちの人格について多くを語ると強く思います。"},
+  {label:"でる度A #368",target:"port",jp:"港",
+   en:"Do you think she sees her hometown as a port she always returns to, or as the place she needed to leave in order to become herself?",
+   ja:"彼女は故郷を常に戻ってくる港として見るのか、それとも自分自身になるために離れる必要があった場所として見るのかと思いますか？"},
+  {label:"でる度A #369",target:"reception",jp:"歓迎会",
+   en:"I honestly think that the reception we give to new ideas says everything about how open we truly are to growth and change.",
+   ja:"新しいアイデアへの歓迎の仕方は、成長と変化に対して本当にどれほど開放的であるかについてすべてを語ると正直思います。"},
+  {label:"でる度A #370",target:"coworker",jp:"同僚",
+   en:"Have you ever had a coworker whose presence made the whole atmosphere lighter, and only realized how much they meant when they were gone?",
+   ja:"その存在が全体の雰囲気を明るくした同僚がいて、いなくなってから初めてどれほど大切だったかに気づいたことはありますか？"},
+  {label:"でる度A #371",target:"rust",jp:"錆",
+   en:"I really believe that talent, like metal left unused, will eventually rust if it is not regularly exercised and exposed to challenge.",
+   ja:"才能は、使われない金属のように、定期的に鍛えられ挑戦にさらされなければ、やがて錆びると強く信じています。"},
+  {label:"でる度A #372",target:"athletics",jp:"スポーツ",
+   en:"Have you ever noticed how athletics can teach a kind of discipline and resilience that formal education rarely manages to instill?",
+   ja:"スポーツが、正規の教育ではほとんど植え付けることができない種類の規律と回復力を教えることに気づいたことはありますか？"},
+  {label:"でる度A #373",target:"voyage",jp:"航海",
+   en:"I really think that every significant relationship is a kind of voyage — you set out together not knowing what weather you will face.",
+   ja:"すべての重要な関係は一種の航海だと強く思います。どんな天気に直面するかを知らないまま、一緒に出発します。"},
+  {label:"でる度A #374",target:"ecologist",jp:"生態学者",
+   en:"Do you think she would ever consider becoming an ecologist if she could start over, or does she feel her current path is exactly right?",
+   ja:"もし最初からやり直せるなら生態学者になることを考えると思いますか、それとも現在の道がまさに正しいと感じているのかと思いますか？"},
+  {label:"でる度A #375",target:"soul",jp:"魂",
+   en:"I honestly believe there are moments of music, silence, and human connection that seem to reach a part of us we can only call the soul.",
+   ja:"音楽、沈黙、そして人とのつながりの瞬間には、魂としか呼べない自分の一部に届くように思えるものがあると正直信じています。"},
+  {label:"でる度A #376",target:"isolated",jp:"孤立した",
+   en:"Have you ever felt most isolated not in empty rooms but in crowded spaces where no one seemed to truly see you?",
+   ja:"空の部屋ではなく、誰も本当に自分を見てくれないような混んだ場所で最も孤立したと感じたことはありますか？"},
+  {label:"でる度A #377",target:"biased",jp:"偏った",
+   en:"I really think that everyone is biased in ways they cannot fully see, which is precisely why humility and self-examination are so essential.",
+   ja:"誰もが自分には完全に見えない形で偏っているからこそ、謙虚さと自己検討が非常に不可欠なのだと強く思います。"},
+  {label:"でる度A #378",target:"multiple",jp:"多数の",
+   en:"Do you think she has come to peace with the idea that she can hold multiple truths at once — that something can be both good and deeply flawed?",
+   ja:"何かが良いと同時に深く欠陥があるという、複数の真実を同時に保持できるというアイデアと折り合いをつけたと思いますか？"},
+  {label:"でる度A #379",target:"crucial",jp:"重要な",
+   en:"I honestly think that the crucial moment in any transformation is not the dramatic decision but the quiet one made alone in the dark.",
+   ja:"いかなる変革においても重要な瞬間は、劇的な決断ではなく、暗闇の中で一人で行われる静かな決断だと正直思います。"},
+  {label:"でる度A #380",target:"remote",jp:"人里離れた",
+   en:"Have you ever spent time in a truly remote place and discovered a version of yourself that city life had quietly buried?",
+   ja:"本当に人里離れた場所で時間を過ごし、都市生活が静かに埋葬していた自分のバージョンを発見したことはありますか？"},
+  {label:"でる度A #381",target:"encouraging",jp:"励みになる",
+   en:"I really think that an encouraging word given at the right moment costs nothing and yet can mean absolutely everything to the person who receives it.",
+   ja:"適切な瞬間に与えられる励みになる言葉は何の費用もかからないのに、受け取る人にとってはすべてを意味し得ると強く思います。"},
+  {label:"でる度A #382",target:"underground",jp:"地下の",
+   en:"Do you think she ever feels that her most important thoughts and feelings remain underground, unseen by the people who matter most to her?",
+   ja:"彼女の最も重要な思いと感情が、最も大切な人々に見られないまま地下に留まっていると時々感じると思いますか？"},
+  {label:"でる度A #383",target:"stable",jp:"安定した",
+   en:"I honestly believe that a stable sense of self is not one that never wavers but one that always finds its way back to its own center.",
+   ja:"安定した自己感覚とは、決して揺らがないものではなく、常に自分の中心に戻る道を見つけるものだと正直信じています。"},
+  {label:"でる度A #384",target:"domestic",jp:"国内の",
+   en:"Have you ever noticed how domestic policy decisions made in distant capitals can quietly reshape the most intimate details of ordinary daily life?",
+   ja:"遠い首都で行われた国内の政策決定が、日常生活の最も親密な詳細を静かに再形成する様子に気づいたことはありますか？"},
+  {label:"でる度A #385",target:"shallow",jp:"浅はかな",
+   en:"I really think that what looks like shallow behavior on the surface is often a defense mechanism protecting something much deeper and more tender.",
+   ja:"表面上は浅はかな行動に見えることが、しばしばより深く繊細な何かを守る防衛機制であることが多いと強く思います。"},
+  {label:"でる度A #386",target:"willing",jp:"こころよくする",
+   en:"Do you think she is truly willing to change the things about herself she knows are causing harm, or does awareness stop short of action?",
+   ja:"害を与えていると知っている自分の部分を変えることに本当にこころよくしているのか、それとも認識が行動の一歩手前で止まっているのかと思いますか？"},
+  {label:"でる度A #387",target:"superior",jp:"優れている",
+   en:"I honestly think that people who constantly need to feel superior to others are often most afraid of discovering they are not enough on their own.",
+   ja:"常に他者より優れていると感じる必要がある人々は、しばしば自分だけでは十分でないことを発見することを最も恐れていると正直思います。"},
+  {label:"でる度A #388",target:"profitable",jp:"利益になる",
+   en:"Have you ever felt conflicted about doing something that was profitable but went against values you had always believed in?",
+   ja:"利益になるが、常に信じてきた価値観に反することをすることに葛藤を感じたことはありますか？"},
+  {label:"でる度A #389",target:"solid",jp:"確実な",
+   en:"I really believe that solid friendships are not built in moments of celebration but in the quieter moments when you show up despite your own exhaustion.",
+   ja:"確実な友情は祝いの瞬間ではなく、自分の疲労にもかかわらず現れるという静かな瞬間に築かれると強く信じています。"},
+  {label:"でる度A #390",target:"tremendous",jp:"途方もない",
+   en:"Do you think she feels the tremendous weight of responsibility that comes with being someone others genuinely look up to and depend on?",
+   ja:"他者が本当に尊敬し依存している人物であることに伴う途方もない責任の重みを、彼女は感じていると思いますか？"},
+  {label:"でる度A #391",target:"intellectual",jp:"知的な",
+   en:"I honestly think that intellectual curiosity — the genuine desire to understand rather than to win — is one of the most attractive qualities a person can have.",
+   ja:"知的な好奇心、つまり勝つためではなく理解したいという本物の欲求は、人が持てる最も魅力的な資質の一つだと正直思います。"},
+  {label:"でる度A #392",target:"chief",jp:"主な",
+   en:"Have you ever identified the chief reason you keep repeating a pattern and still found it nearly impossible to stop, even with full awareness?",
+   ja:"パターンを繰り返し続ける主な理由を特定しても、完全に認識していても、止めることがほぼ不可能だと気づいたことはありますか？"},
+  {label:"でる度A #393",target:"steady",jp:"着実な",
+   en:"I really think that a steady, quiet commitment to something meaningful will almost always outlast the dramatic, short-lived burst of enthusiasm.",
+   ja:"意味のあることへの着実で静かな献身は、ほぼ常に劇的で短命な熱狂の爆発を凌ぐと強く思います。"},
+  {label:"でる度A #394",target:"evil",jp:"邪悪な",
+   en:"Do you think she believes that truly evil acts come only from evil people, or does she understand how ordinary circumstances can lead ordinary people there?",
+   ja:"真に邪悪な行為は邪悪な人からのみ来ると彼女は信じているのか、それとも平凡な状況がいかに平凡な人々をそこに導くかを理解しているのかと思いますか？"},
+  {label:"でる度A #395",target:"coastal",jp:"沿岸の",
+   en:"I honestly feel a deep sadness about the number of coastal communities that will be permanently altered by rising sea levels within our lifetime.",
+   ja:"私たちの生涯の中で海面上昇によって永続的に変えられる沿岸のコミュニティの数について、深い悲しみを正直感じています。"},
+  {label:"でる度A #396",target:"dairy",jp:"乳製品の",
+   en:"Have you ever thought about the quiet complexity behind a single glass of milk and what the dairy industry actually costs in terms of welfare and land?",
+   ja:"一杯のミルクの背後にある静かな複雑さと、乳製品業界が福祉と土地の面で実際に何を犠牲にしているかを考えたことはありますか？"},
+  {label:"でる度A #397",target:"digestive",jp:"消化の",
+   en:"I really think that the connection between the digestive system and mental health is one of the most underappreciated frontiers in modern medicine.",
+   ja:"消化の系統と精神的健康の間のつながりは、現代医学で最も過小評価されているフロンティアの一つだと強く思います。"},
+  {label:"でる度A #398",target:"loyal",jp:"忠実な",
+   en:"Do you think she is the kind of person who remains loyal even when loyalty is inconvenient, or does she quietly reassess when the cost gets high?",
+   ja:"彼女は忠誠心が不便なときでも忠実であり続ける種類の人なのか、それとも代価が高くなると静かに再評価するのかと思いますか？"},
+  {label:"でる度A #399",target:"sensory",jp:"感覚の",
+   en:"I honestly think that slowing down to notice sensory details — the smell of coffee, the light through leaves — is one of the simplest paths back to presence.",
+   ja:"コーヒーの香りや葉を通る光などの感覚の細部に気づくためにゆっくりすることは、現在に戻る最もシンプルな道の一つだと正直思います。"},
+  {label:"でる度A #400",target:"fancy",jp:"高級な",
+   en:"Have you ever been served a meal in a very fancy restaurant and felt inexplicably underwhelmed by how little it actually nourished you inside?",
+   ja:"非常に高級なレストランで食事を出されて、実際にどれほど内面を満たさなかったかに不思議なほど失望したことはありますか？"},
+  {label:"でる度A #401",target:"spoil",jp:"台無しにする",
+   en:"I really think that one act of pettiness or cruelty can spoil years of goodwill in a way that patience and kindness struggle to fully repair.",
+   ja:"一つの些細さや残酷さが、忍耐と優しさが完全に修復するのに苦労する方法で、何年もの善意を台無しにすることがあると強く思います。"},
+  {label:"でる度A #402",target:"stimulate",jp:"刺激する",
+   en:"Do you think she seeks out experiences that genuinely stimulate her thinking, or does she sometimes prefer the comfort of what is already familiar?",
+   ja:"彼女は本当に思考を刺激する経験を求めるのか、それとも時々すでに親しみのあるものの快適さを好むのかと思いますか？"},
+  {label:"でる度A #403",target:"distract",jp:"注意をそらす",
+   en:"I honestly think we use entertainment and noise to distract ourselves from the quiet questions that would actually bring us closer to who we are.",
+   ja:"私たちは娯楽と騒音を使って、実際に自分が何者かに近づけてくれる静かな問いから注意をそらすと正直思います。"},
+  {label:"でる度A #404",target:"bargain",jp:"交渉する",
+   en:"Have you ever tried to bargain with yourself over a change you know you need to make and found that you are not a reliable negotiator?",
+   ja:"必要だとわかっている変化について自分自身と交渉しようとして、自分が信頼できる交渉者ではないと気づいたことはありますか？"},
+  {label:"でる度A #405",target:"emerge",jp:"明らかになる",
+   en:"I really believe that the truest version of a person tends to emerge not when life is easy but when it becomes almost too hard to bear.",
+   ja:"人の最も真実のバージョンは、人生が簡単なときではなく、ほとんど耐えられないほど難しくなったときに明らかになる傾向があると強く信じています。"},
+  {label:"でる度A #406",target:"browse",jp:"見て歩く",
+   en:"Do you think she uses the habit of browse online to genuinely explore new ideas, or mainly to avoid sitting alone with her own thoughts?",
+   ja:"彼女はオンラインを見て歩く習慣を本当に新しいアイデアを探るために使っているのか、それとも主に自分の思考と一人で座ることを避けるために使っているのかと思いますか？"},
+  {label:"でる度A #407",target:"define",jp:"定義する",
+   en:"I honestly think that refusing to let a single experience or label define you for life is one of the most quietly radical acts of self-respect.",
+   ja:"一つの経験やレベルに生涯にわたって自分を定義させることを拒否することは、最も静かに根本的な自尊心の行為の一つだと正直思います。"},
+  {label:"でる度A #408",target:"adjust",jp:"調節する",
+   en:"Have you ever had to adjust to a version of your life that looked nothing like what you had planned and found unexpected gifts inside the grief?",
+   ja:"計画していたものとは全く異なる人生のバージョンに調節しなければならず、悲しみの中に予想外の贈り物を見つけたことはありますか？"},
+  {label:"でる度A #409",target:"deserve",jp:"値する",
+   en:"I really think one of the deepest forms of suffering is believing you do not deserve the love, rest, and peace that every human being needs.",
+   ja:"最も深い苦しみの形の一つは、すべての人間が必要とする愛、休息、そして平和に自分が値しないと信じることだと強く思います。"},
+  {label:"でる度A #410",target:"undergo",jp:"経験する",
+   en:"Do you think she understands that to undergo genuine transformation, you must be willing to feel profoundly uncomfortable for an extended period?",
+   ja:"本物の変容を経験するには、長期間にわたって深く不快に感じることを厭わない必要があることを彼女は理解していると思いますか？"},
+  {label:"でる度A #411",target:"contradict",jp:"矛盾する",
+   en:"I honestly believe that the ability to hold views that contradict each other without collapsing is one of the marks of a truly mature mind.",
+   ja:"崩れることなく互いに矛盾する見解を保持する能力は、真に成熟した心の証の一つだと正直信じています。"},
+  {label:"でる度A #412",target:"withdraw",jp:"引き出す",
+   en:"Have you ever watched someone you love slowly withdraw from you and felt both helpless and desperate to understand what you might have done?",
+   ja:"愛する人がゆっくりとあなたから離れていくのを見て、無力と同時に自分が何をしたかを理解しようと必死になったことはありますか？"},
+  {label:"でる度A #413",target:"accompany",jp:"一緒に行く",
+   en:"I really think that the willingness to accompany someone through their darkest moment, without trying to fix it, is the highest form of friendship.",
+   ja:"それを直そうとせずに誰かの最も暗い瞬間に一緒に行く意志は、友情の最高の形だと強く思います。"},
+  {label:"でる度A #414",target:"infect",jp:"感染させる",
+   en:"Do you think she realizes that optimism and hope can infect a room just as powerfully as despair, if she chooses to carry them in?",
+   ja:"彼女が持ち込むことを選べば、楽観主義と希望は絶望と同じくらい強力に部屋に感染させることができると彼女は気づいていると思いますか？"},
+  {label:"でる度A #415",target:"rebel",jp:"反抗する",
+   en:"I honestly think that the healthiest way to rebel is not against others but against the smaller, more frightened version of yourself.",
+   ja:"最も健全な反抗の方法は他者に対してではなく、自分自身のより小さく、より怖れている部分に対してだと正直思います。"},
+  {label:"でる度A #416",target:"convert",jp:"改造する",
+   en:"Have you ever tried to convert a deeply held belief and realized that the mind changes its furniture far more slowly than we expect?",
+   ja:"深く持つ信念を改造しようとして、心が私たちの期待よりもはるかにゆっくりと家具を変えることに気づいたことはありますか？"},
+  {label:"でる度A #417",target:"calculate",jp:"算出する",
+   en:"I really think that the costs worth caring about in life are the ones you cannot easily calculate — time, dignity, and peace of mind.",
+   ja:"人生で気にかける価値のある代価は、時間、尊厳、そして心の平和など、簡単に算出することができないものだと強く思います。"},
+  {label:"でる度A #418",target:"utilize",jp:"利用する",
+   en:"Do you think she knows how to utilize periods of stillness and silence as fuel for creativity rather than as symptoms of emptiness?",
+   ja:"彼女は静けさと沈黙の時期を、空虚さの症状としてではなく創造性の燃料として利用する方法を知っていると思いますか？"},
+  {label:"でる度A #419",target:"admit",jp:"認める",
+   en:"I honestly believe that the courage to admit you were wrong is rarer and more valuable than the ability to defend your position indefinitely.",
+   ja:"間違っていたと認める勇気は、立場を無限に守る能力よりも稀で価値があると正直信じています。"},
+  {label:"でる度A #420",target:"punish",jp:"罰する",
+   en:"Have you ever noticed how harshly you punish yourself for mistakes you would immediately forgive in the people you love most?",
+   ja:"最も愛する人々なら即座に許す過ちを、自分自身をいかに厳しく罰するかに気づいたことはありますか？"},
+  {label:"でる度A #421",target:"approve",jp:"承認する",
+   en:"I really think that waiting for others to approve of your choices before you can feel good about them is a way of giving away your own authority.",
+   ja:"自分の選択について良く感じる前に他者の承認を待つことは、自分自身の権限を手放す方法だと強く思います。"},
+  {label:"でる度A #422",target:"owe",jp:"おかげである",
+   en:"Have you ever sat quietly and counted all the people to whom you owe a debt of gratitude that you have never properly expressed?",
+   ja:"これまで適切に表現したことのない感謝の借りがある、すべての人々を静かに数えたことはありますか？"},
+  {label:"でる度A #423",target:"proceed",jp:"向かう",
+   en:"I really think that knowing when to pause and when to proceed is one of the most undervalued forms of wisdom in any endeavor.",
+   ja:"いつ止まり、いつ向かうかを知ることは、いかなる取り組みにおいても最も過小評価されている知恵の形の一つだと強く思います。"},
+  {label:"でる度A #424",target:"navigate",jp:"操縦する",
+   en:"Do you think she has learned to navigate the complicated relationship between ambition and contentment without losing herself in either?",
+   ja:"彼女はどちらにも自分を失わずに、野心と満足感の複雑な関係を操縦することを学んだと思いますか？"},
+  {label:"でる度A #425",target:"postpone",jp:"延期する",
+   en:"I honestly think that our tendency to postpone difficult conversations is one of the most common ways we damage our closest relationships.",
+   ja:"難しい会話を延期する傾向は、最も親密な関係を傷つける最も一般的な方法の一つだと正直思います。"},
+  {label:"でる度A #426",target:"swallow",jp:"飲み込む",
+   en:"Have you ever had to swallow your pride in a way that felt humiliating at the time but proved to be the beginning of real growth?",
+   ja:"当時は屈辱的に感じたが、本物の成長の始まりであることが判明した形で、プライドを飲み込まなければならなかったことはありますか？"},
+  {label:"でる度A #427",target:"tailor",jp:"条件に合わせて作る",
+   en:"I really believe that the most effective teachers are those who tailor their approach to the specific fears and strengths of each individual student.",
+   ja:"最も効果的な教師は、各生徒の具体的な恐れと強みに合わせてアプローチを条件に合わせて作る人々だと強く信じています。"},
+  {label:"でる度A #428",target:"overhear",jp:"偶然耳にする",
+   en:"Do you think she would be honest about changing her opinion if she happened to overhear a compelling argument she had not considered before?",
+   ja:"以前に考慮していなかった説得力のある議論を偶然耳にしたとき、意見を変えることを正直に認めると思いますか？"},
+  {label:"でる度A #429",target:"consequence",jp:"結果",
+   en:"I honestly think that most people are willing to take risks when they underestimate the consequence and only become cautious when the cost becomes real.",
+   ja:"ほとんどの人は結果を過小評価するときにリスクを取る意欲があり、代価が現実になったときにのみ慎重になると正直思います。"},
+  {label:"でる度A #430",target:"application",jp:"申請書",
+   en:"Have you ever stared at an application and felt the strange vulnerability of trying to compress who you are into a few pages for someone to judge?",
+   ja:"申請書を見つめて、誰かに判断されるために自分が誰かを数ページに圧縮しようとする奇妙な脆さを感じたことはありますか？"},
+  {label:"でる度A #431",target:"workout",jp:"運動",
+   en:"I really think the best workout is not the one that exhausts your body but the one that leaves you feeling genuinely more alive afterward.",
+   ja:"最良の運動は体を疲弊させるものではなく、その後に本当により生き生きとした気分にさせるものだと強く思います。"},
+  {label:"でる度A #432",target:"obstacle",jp:"障害物",
+   en:"Do you think she sees each obstacle in her path as something to overcome, or has she learned to ask what it might be trying to teach her?",
+   ja:"彼女は道の障害物をそれぞれ乗り越えるべきものとして見るのか、それともそれが何を教えようとしているかを尋ねることを学んだのかと思いますか？"},
+  {label:"でる度A #433",target:"treaty",jp:"条約",
+   en:"I honestly think that every treaty between nations, however imperfect, represents a hard-won choice for conversation over destruction.",
+   ja:"どんなに不完全でも、国家間のすべての条約は、破壊よりも対話を選ぶ苦労して勝ち取った選択を表していると正直思います。"},
+  {label:"でる度A #434",target:"deforestation",jp:"森林破壊",
+   en:"Have you ever flown over a region of severe deforestation and felt the loss as something almost physical — a wound in the earth below?",
+   ja:"ひどい森林破壊の地域の上を飛んで、地球の傷のような、ほとんど身体的な何かとしてその喪失を感じたことはありますか？"},
+  {label:"でる度A #435",target:"infrastructure",jp:"インフラ",
+   en:"I really think that a country's infrastructure reveals its true priorities — which communities it values and which it has decided can wait.",
+   ja:"国のインフラは、どのコミュニティを大切にし、どのコミュニティが待てると決めたかという真の優先順位を明らかにすると強く思います。"},
+  {label:"でる度A #436",target:"contribution",jp:"貢献",
+   en:"Do you think she ever doubts whether her contribution to the people and projects she cares about is genuinely making a difference?",
+   ja:"彼女が気にかける人々やプロジェクトへの貢献が本当に違いをもたらしているかどうかを時々疑うと思いますか？"},
+  {label:"でる度A #437",target:"congestion",jp:"渋滞",
+   en:"I honestly think that the congestion in our cities reflects something deeper — a collective failure to imagine and plan for how people actually live.",
+   ja:"都市の渋滞は、人々が実際にどのように生きているかを想像し計画することへの集合的な失敗という、より深い何かを反映していると正直思います。"},
+  {label:"でる度A #438",target:"exposure",jp:"身をさらすこと",
+   en:"Have you ever found that repeated exposure to something you once feared gradually transformed your relationship to it in ways you never expected?",
+   ja:"かつて恐れていたものへの繰り返しの身をさらすことが、予期しなかった方法でそれとの関係を徐々に変えたことを見つけたことはありますか？"},
+  {label:"でる度A #439",target:"blow",jp:"打撃",
+   en:"I really think that the deepest blow is not the one that knocks you down but the one that makes you question whether getting up is worth it.",
+   ja:"最も深い打撃は、あなたを倒すものではなく、立ち上がることが価値があるかどうかを疑わせるものだと強く思います。"},
+  {label:"でる度A #440",target:"participation",jp:"参加",
+   en:"Do you think she believes that meaningful participation in community life is worth the time and energy it demands from an already busy person?",
+   ja:"地域生活への意味のある参加は、すでに忙しい人から要求する時間とエネルギーに値すると彼女は信じていると思いますか？"},
+  {label:"でる度A #441",target:"crisis",jp:"危機",
+   en:"I honestly think that how a person behaves during a crisis reveals more about their true character than years of ordinary comfortable living.",
+   ja:"危機の間の人の行動は、何年もの普通の快適な生活よりも、真の人格についてより多くを明らかにすると正直思います。"},
+  {label:"でる度A #442",target:"ancestor",jp:"先祖",
+   en:"Have you ever thought about how your ancestor could not have imagined the world you live in, and wondered what the next generations will inherit from you?",
+   ja:"先祖があなたが生きる世界を想像できなかったことを考え、次の世代があなたから何を受け継ぐかと思ったことはありますか？"},
+  {label:"でる度A #443",target:"architect",jp:"建築家",
+   en:"I really believe that every parent is in some sense an architect — not of buildings but of the invisible structures inside another human being.",
+   ja:"すべての親はある意味で建築家だと強く信じています。建物ではなく、別の人間の内側にある目に見えない構造の。"},
+  {label:"でる度A #444",target:"existence",jp:"存在",
+   en:"Do you think she has ever been struck by the sheer improbability of her own existence and felt something between awe and responsibility?",
+   ja:"彼女は自分の存在の全くの非可能性に打たれ、畏敬と責任の間にある何かを感じたことがあると思いますか？"},
+  {label:"でる度A #445",target:"deposit",jp:"内金",
+   en:"I honestly think that every act of kindness is a kind of deposit into a shared account of human trust that we all draw from invisibly.",
+   ja:"すべての親切の行為は、私たちが全員目に見えない形で引き出す人間の信頼の共有口座への一種の内金だと正直思います。"},
+  {label:"でる度A #446",target:"finance",jp:"金融",
+   en:"Have you ever felt that the language of finance creates a distance between us and the very human needs it is supposed to serve?",
+   ja:"金融の言語が、それが仕えるべき非常に人間的なニーズの間に距離を作っていると感じたことはありますか？"},
+  {label:"でる度A #447",target:"awareness",jp:"認識",
+   en:"I really think that awareness of a problem without the will to change is just a more sophisticated form of avoidance.",
+   ja:"変えようとする意志なしに問題の認識だけ持つことは、より洗練された回避の形に過ぎないと強く思います。"},
+  {label:"でる度A #448",target:"intake",jp:"摂取量",
+   en:"Do you think she monitors her daily intake of information as carefully as what she eats, or does she let the algorithm decide what fills her mind?",
+   ja:"彼女は食べるものと同じくらい慎重に毎日の情報の摂取量を監視しているのか、それともアルゴリズムに心を満たすものを決めさせているのかと思いますか？"},
+  {label:"でる度A #449",target:"witness",jp:"目撃者",
+   en:"I honestly think that to be a genuine witness to another person's pain — without flinching or rushing to fix it — is an act of profound courage.",
+   ja:"怯んだり急いで直そうとせずに、別の人の痛みの真の目撃者になることは、深い勇気の行為だと正直思います。"},
+  {label:"でる度A #450",target:"coverage",jp:"報道",
+   en:"Have you ever felt that the media coverage of an event missed something essential about the human reality at its center?",
+   ja:"あるイベントのメディア報道が、その中心にある人間的現実について何か本質的なものを見逃していると感じたことはありますか？"},
+  {label:"でる度A #451",target:"lawsuit",jp:"訴訟",
+   en:"I really think that the threat of a lawsuit has become a way of silencing people who simply want to speak an inconvenient truth.",
+   ja:"訴訟の脅威は、単に不都合な真実を話したい人々を黙らせる方法になったと強く思います。"},
+  {label:"でる度A #452",target:"session",jp:"会議",
+   en:"Do you think she finds long session of planning and discussion energizing, or does she privately wish people would simply trust her judgment and let her act?",
+   ja:"長い計画と議論の会議を活力のあるものだと感じているのか、それとも単に彼女の判断を信頼して行動させてほしいと密かに思っているのかと思いますか？"},
+  {label:"でる度A #453",target:"means",jp:"手段",
+   en:"I honestly think the most important question is not what means are available to you but which ones you are willing to use with integrity.",
+   ja:"最も重要な問いは、どんな手段が利用可能かではなく、どの手段を誠実さを持って使う意志があるかだと正直思います。"},
+  {label:"でる度A #454",target:"pioneer",jp:"先駆者",
+   en:"Have you ever felt grateful to a pioneer whose name you do not even know — someone whose sacrifice made your ordinary freedom possible?",
+   ja:"名前さえ知らない先駆者、つまり自分の犠牲があなたの普通の自由を可能にした誰かに感謝を感じたことはありますか？"},
+  {label:"でる度A #455",target:"satisfaction",jp:"満足",
+   en:"I really think that the deepest satisfaction comes not from achieving what you wanted but from becoming someone who can want the right things.",
+   ja:"最も深い満足は、望んでいたものを達成することからではなく、正しいものを望める人間になることから来ると強く思います。"},
+  {label:"でる度A #456",target:"basis",jp:"根拠",
+   en:"Do you think she examines the basis of her strongest opinions, or does she prefer to hold them without too much scrutiny?",
+   ja:"彼女は最も強い意見の根拠を検討するのか、それともあまり精査せずに保持することを好むのかと思いますか？"},
+  {label:"でる度A #457",target:"element",jp:"要素",
+   en:"I honestly think that humor is an underrated element of resilience — the ability to find lightness even in the heaviest circumstances.",
+   ja:"ユーモアは回復力の過小評価された要素であり、最も重い状況でさえ軽さを見つける能力だと正直思います。"},
+  {label:"でる度A #458",target:"phenomenon",jp:"現象",
+   en:"Have you ever watched a natural phenomenon — a storm, an eclipse, a migration — and felt briefly freed from every human concern?",
+   ja:"嵐、日食、渡り鳥など、自然の現象を見て、すべての人間的な懸念から一時的に解放されたと感じたことはありますか？"},
+  {label:"でる度A #459",target:"scale",jp:"規模",
+   en:"I really think that the scale of a problem should never be used as an excuse to do nothing, because every large change begins somewhere small.",
+   ja:"問題の規模は何もしない言い訳として使うべきではありません。なぜならすべての大きな変化はどこか小さなところから始まるからだと強く思います。"},
+  {label:"でる度A #460",target:"journal",jp:"雑誌",
+   en:"Do you think she has ever kept a journal and discovered in rereading it that she had been far wiser in her darkest moments than she realized?",
+   ja:"日記をつけ、読み返す中で、最も暗い瞬間に自分が気づいていたよりもはるかに賢かったと発見したことがあると思いますか？"},
+  {label:"でる度A #461",target:"grain",jp:"穀物",
+   en:"I honestly think there is a quiet dignity in the labor of those who grow grain and feed the world while being among the least celebrated.",
+   ja:"穀物を育て世界を養いながら、最も称えられない人々の労働には静かな尊厳があると正直思います。"},
+  {label:"でる度A #462",target:"continent",jp:"大陸",
+   en:"Have you ever looked at a map and felt a deep longing for a continent you have never visited and a life you have never lived?",
+   ja:"地図を見て、訪れたことのない大陸と生きたことのない人生への深い憧れを感じたことはありますか？"},
+  {label:"でる度A #463",target:"headquarters",jp:"本社",
+   en:"I really think that decisions made in distant headquarters often fail because they are too far removed from the lived reality of the people they affect.",
+   ja:"遠い本社で行われる決断は、影響を受ける人々の生きた現実からあまりにも遠いため、しばしば失敗すると強く思います。"},
+  {label:"でる度A #464",target:"globalization",jp:"グローバル化",
+   en:"Do you think she sees globalization as a force that connects humanity or one that quietly erases the differences that make each culture irreplaceable?",
+   ja:"彼女はグローバル化を人類をつなぐ力として見るのか、それとも各文化をかけがえないものにする違いを静かに消す力として見るのかと思いますか？"},
+  {label:"でる度A #465",target:"brochure",jp:"パンフレット",
+   en:"I honestly think that the life promised in a travel brochure and the life you actually live when you get there are two beautifully different things.",
+   ja:"旅行のパンフレットで約束された生活と、実際に行ったときに生きる生活は、二つの美しく異なるものだと正直思います。"},
+  {label:"でる度A #466",target:"inspection",jp:"検査",
+   en:"Have you ever undergone a medical inspection and felt the vulnerability of having your body assessed by someone who does not know your story?",
+   ja:"医学的な検査を受けて、あなたの物語を知らない人に体を評価される脆さを感じたことはありますか？"},
+  {label:"でる度A #467",target:"attendance",jp:"出席者数",
+   en:"I really think that in any community, regular attendance is one of the most honest expressions of where your real commitments lie.",
+   ja:"どんなコミュニティでも、定期的な出席者数は、本当のコミットメントがどこにあるかの最も正直な表現の一つだと強く思います。"},
+  {label:"でる度A #468",target:"copper",jp:"銅",
+   en:"Do you think she ever wonders about the journey a single piece of copper makes — from deep underground to the device in her hand right now?",
+   ja:"一片の銅が地下深くから今手の中にある機器まで辿る旅について、彼女は時々思うことがあると思いますか？"},
+  {label:"でる度A #469",target:"dozen",jp:"1ダース",
+   en:"I honestly think that a dozen small acts of consistent kindness matter far more than one grand dramatic gesture that is soon forgotten.",
+   ja:"すぐに忘れられる一度の壮大な劇的なジェスチャーよりも、一ダースの一貫した小さな親切の行為の方がはるかに重要だと正直思います。"},
+  {label:"でる度A #470",target:"flu",jp:"インフルエンザ",
+   en:"Have you ever had the flu badly enough that it reminded you how much you take your ordinary good health for granted every single day?",
+   ja:"インフルエンザで十分ひどくなり、毎日当たり前の健康をいかに当然のこととして受け取っているかを思い知らされたことはありますか？"},
+  {label:"でる度A #471",target:"burial",jp:"埋葬",
+   en:"I really think that attending a burial forces a kind of honesty about what matters and what does not that ordinary life tends to avoid.",
+   ja:"埋葬に参列することは、日常生活が避けがちな、何が重要で何がそうでないかについての一種の誠実さを強いると強く思います。"},
+  {label:"でる度A #472",target:"mold",jp:"カビ",
+   en:"Do you think she ever worries that without new challenges and fresh air, comfort can quietly become a kind of mold that grows over ambition?",
+   ja:"新しい挑戦と新鮮な空気がなければ、快適さが野心の上に生えるカビの一種に静かになることがあると彼女は心配することがあると思いますか？"},
+  {label:"でる度A #473",target:"patch",jp:"区画",
+   en:"I honestly believe that a small patch of garden, tended with patience over years, teaches something about care that few other things can.",
+   ja:"何年もかけて忍耐を持って手入れされた小さな区画の庭は、他のほとんどのものが教えられない世話について何かを教えてくれると正直信じています。"},
+  {label:"でる度A #474",target:"diagram",jp:"図",
+   en:"Have you ever looked at a complex diagram of how something works and felt a quiet awe at how much invisible order exists beneath visible simplicity?",
+   ja:"何かがどのように機能するかの複雑な図を見て、目に見えるシンプルさの下にいかに多くの目に見えない秩序が存在するかへの静かな畏敬を感じたことはありますか？"},
+  {label:"でる度A #475",target:"placement",jp:"斡旋",
+   en:"I really think that the placement of a child in a school or environment that truly understands them can alter the entire course of their development.",
+   ja:"子供を本当に理解している学校や環境への斡旋は、発達の全過程を変えることができると強く思います。"},
+  {label:"でる度A #476",target:"shame",jp:"残念なこと",
+   en:"Do you think she can distinguish between healthy guilt, which motivates change, and corrosive shame, which simply makes her want to disappear?",
+   ja:"変化を促す健全な罪悪感と、単に消えたくさせる腐食性の残念な気持ちを区別できると彼女は思いますか？"},
+  {label:"でる度A #477",target:"wheelchair",jp:"車椅子",
+   en:"I honestly think that a society which fails to make its public spaces fully accessible to those in a wheelchair reveals a failure of both imagination and empathy.",
+   ja:"車椅子の人々に公共スペースを完全にアクセスできるようにしない社会は、想像力と共感の両方の失敗を明らかにすると正直思います。"},
+  {label:"でる度A #478",target:"experienced",jp:"熟練した",
+   en:"Have you ever worked alongside someone truly experienced and felt the humbling difference between what they noticed and what you had completely overlooked?",
+   ja:"本当に熟練した人と一緒に働き、彼らが気づいたこととあなたが完全に見落としていたことの謙虚にさせる違いを感じたことはありますか？"},
+  {label:"でる度A #479",target:"initial",jp:"最初の",
+   en:"Do you think the initial impression you form of a person is usually right, or do you find it is often misleading?",
+   ja:"最初に形成するある人への印象は通常正しいと思いますか、それとも誤解を招くことが多いと思いますか？"},
+  {label:"でる度A #480",target:"mainstream",jp:"主流の",
+   en:"I really think that ideas which are outside the mainstream today are often simply the mainstream of a generation that has not yet arrived.",
+   ja:"今日の主流の外にあるアイデアは、しばしば単にまだ来ていない世代の主流に過ぎないと強く思います。"},
+  {label:"でる度A #481",target:"appropriate",jp:"適切な",
+   en:"Do you think she always knows what the most appropriate response to someone's pain is, or does she sometimes say the wrong thing with good intentions?",
+   ja:"誰かの痛みへの最も適切な反応が常にわかるのか、それとも時々良い意図で間違ったことを言うことがあると思いますか？"},
+  {label:"でる度A #482",target:"fake",jp:"偽物の",
+   en:"I honestly think that a fake smile offered consistently is more exhausting than a real one given rarely, both for the person wearing it and the one receiving it.",
+   ja:"一貫して与える偽物の笑顔は、まれに与える本物の笑顔よりも、それを見せる人にとっても受け取る人にとっても疲弊させると正直思います。"},
+  {label:"でる度A #483",target:"alert",jp:"用心している",
+   en:"Have you ever been so emotionally exhausted that you were no longer alert to the subtle signals people send when they need help?",
+   ja:"感情的に疲弊しすぎて、人々が助けを必要としているときに送る微妙なシグナルに用心している状態でなくなったことはありますか？"},
+  {label:"でる度A #484",target:"fatal",jp:"致命的な",
+   en:"I really think that the most fatal flaw in any relationship is not conflict but the gradual decision to stop being honest with each other.",
+   ja:"いかなる関係においても最も致命的な欠陥は、衝突ではなく、お互いに正直であることを徐々にやめる決断だと強く思います。"},
+  {label:"でる度A #485",target:"nutritious",jp:"栄養のある",
+   en:"Do you think she considers her emotional diet as carefully as her physical one and asks whether what she consumes each day is genuinely nutritious?",
+   ja:"彼女は毎日消費するものが本当に栄養のあるものかどうかを問いながら、感情的な食事を身体的なものと同じくらい慎重に考えていると思いますか？"},
+  {label:"でる度A #486",target:"sophisticated",jp:"洗練された",
+   en:"I honestly think that the most sophisticated response to disagreement is not to win the argument but to remain genuinely curious about where the other view came from.",
+   ja:"不一致への最も洗練された反応は、議論に勝つことではなく、相手の見解がどこから来たかについて本当に好奇心を保ち続けることだと正直思います。"},
+  {label:"でる度A #487",target:"automatic",jp:"自動の",
+   en:"Have you ever noticed how automatic your defenses have become and wondered whether they are still protecting you or just preventing real connection?",
+   ja:"防衛がいかに自動的になっているかに気づき、それがまだあなたを守っているのか、それとも単に本物のつながりを妨げているのかと思ったことはありますか？"},
+  {label:"でる度A #488",target:"raw",jp:"生の",
+   en:"I really think there is something deeply valuable about sharing your most raw and unfiltered thoughts with someone you completely trust.",
+   ja:"完全に信頼する人に最も生の無加工な考えを共有することには、深く価値のある何かがあると強く思います。"},
+  {label:"でる度A #489",target:"slight",jp:"わずかな",
+   en:"Do you think she notices the slight shifts in her own mood and energy before they become full emotional states that are harder to navigate?",
+   ja:"彼女は、対処するのが難しい完全な感情状態になる前に、自分の気分とエネルギーのわずかな変化に気づくと思いますか？"},
+  {label:"でる度A #490",target:"man-made",jp:"人工の",
+   en:"I honestly think that the most devastating man-made disasters have almost always been preceded by warnings that were inconvenient to hear.",
+   ja:"最も壊滅的な人工の災害はほぼ常に、聞くのが不都合な警告が先行していたと正直思います。"},
+  {label:"でる度A #491",target:"aging",jp:"高齢化する",
+   en:"Have you ever sat with someone who is aging and felt both the sadness of what is fading and the deep beauty of what has been fully lived?",
+   ja:"高齢化している人と一緒に座って、消えていくものへの悲しみと、完全に生きられたものの深い美しさの両方を感じたことはありますか？"},
+  {label:"でる度A #492",target:"spiritual",jp:"精神的な",
+   en:"I really think that the search for spiritual meaning is one of the most essentially human impulses, whatever form it takes in each individual life.",
+   ja:"精神的な意味の探求は、各個人の人生でどのような形をとるにしても、最も本質的に人間的な衝動の一つだと強く思います。"},
+  {label:"でる度A #493",target:"endangered",jp:"絶滅危惧の",
+   en:"Do you think she feels a personal sense of loss when she learns that another endangered species has quietly disappeared from the world?",
+   ja:"別の絶滅危惧の種が静かに世界から消えたと知ったとき、彼女は個人的な喪失感を感じると思いますか？"},
+  {label:"でる度A #494",target:"sticky",jp:"ねばねばの",
+   en:"I honestly think that sticky problems — the ones without clean solutions — are precisely where the most interesting thinking tends to happen.",
+   ja:"きれいな解決策のないねばねばの問題こそが、最も興味深い思考が起こりやすい場所だと正直思います。"},
+  {label:"でる度A #495",target:"fertile",jp:"肥沃な",
+   en:"Have you ever noticed that the most fertile periods of your creativity often follow times of confusion, loss, or complete stillness?",
+   ja:"創造性の最も肥沃な時期は、しばしば混乱、喪失、または完全な静けさの後に来ることに気づいたことはありますか？"},
+  {label:"でる度A #496",target:"elsewhere",jp:"どこかほかで",
+   en:"I really think that the habit of always imagining life would be better elsewhere is one of the most reliable ways to miss the life you are actually living.",
+   ja:"常にどこかほかで人生がより良くなると想像する習慣は、実際に生きている人生を見逃す最も確実な方法の一つだと強く思います。"},
+  {label:"でる度A #497",target:"altogether",jp:"完全に",
+   en:"Do you think she could ever give up social media altogether, or has it become so woven into her daily life that the idea feels unimaginable?",
+   ja:"彼女はソーシャルメディアを完全にやめることができると思いますか、それともそのアイデアが想像できないほど日常生活に織り込まれてしまっているのかと思いますか？"},
+  {label:"でる度A #498",target:"strictly",jp:"厳格に",
+   en:"I honestly think that living too strictly by any set of rules — even good ones — can sometimes make you less human rather than more virtuous.",
+   ja:"どんなに良いものでも、厳格に規則に従って生きることは、時に徳が高くなるよりも人間性が薄くなることがあると正直思います。"},
+  {label:"でる度A #499",target:"beforehand",jp:"前もって",
+   en:"Have you ever wished you had known beforehand what a relationship or experience would cost you emotionally, and then wondered if you would still have chosen it?",
+   ja:"関係や経験が感情的にどんな代価をもたらすかを前もって知っていればと思い、それでも選んでいたかどうかと思ったことはありますか？"},
+  {label:"でる度A #500",target:"likewise",jp:"同じように",
+   en:"I really believe that when we treat others with genuine dignity, they are likewise moved to offer that dignity to someone else in turn.",
+   ja:"他者を本物の尊厳を持って扱うとき、彼らも likewise 今度は誰か他の人にその尊厳を提供するように動かされると強く信じています。"},];
+
+// ── Highlight ──
+function escR(s){ return s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'); }
+function highlight(text, target){
+  if(!text) return '';
+  const parts = text.split(/(<[^>]+>)/);
+  const sorted = [...VOCAB].sort((a,b) => b.w.length - a.w.length);
+  return parts.map(part => {
+    if (part.startsWith('<')) return part;
+    if(target){
+      const base = target.toLowerCase();
+      const forms = [base,base+'s',base+'ed',base+'ing',base+'er',base+'d',
+                     base.replace(/e$/,'ing'),base.replace(/y$/,'ied'),base.replace(/e$/,'ed')]
+        .filter((f,i,a)=>a.indexOf(f)===i).sort((a,b)=>b.length-a.length);
+      const re = new RegExp('\\b('+forms.map(escR).join('|')+')\\b','gi');
+      part = part.replace(re, match => `<span class="tw target-word" data-word="${base}">${match}</span>`);
+    }
+    sorted.forEach(v => {
+      const base = v.w;
+      const forms = [base,base+'s',base+'ed',base+'ing',base+'er',base+'d',
+                     base.replace(/e$/,'ing'),base.replace(/y$/,'ied'),base.replace(/e$/,'ed')]
+        .filter((f,i,a)=>a.indexOf(f)===i).sort((a,b)=>b.length-a.length);
+      const re = new RegExp('\\b('+forms.map(escR).join('|')+')\\b','gi');
+      part = part.replace(re, match => {
+        if(part.includes('class="tw')) return match;
+        const isM = v.src.length > 1;
+        return `<span class="tw${isM?' multi':''}" data-word="${base}">${match}</span>`;
+      });
+    });
+    return part;
+  }).join('');
+}
+
+// ── State ──
+function shuffle(arr){
+  const a=[...arr];
+  for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}
+  return a;
+}
+let blocks = shuffle(ALL_BLOCKS);
+let idx = 0;
+let showingJa = false;
+
+function renderCard(){
+  const b = blocks[idx];
+  document.getElementById('card-source-en').textContent = b.label;
+  document.getElementById('card-body-en').innerHTML = highlight(b.en||'', b.target||null);
+  document.getElementById('card-body-ja').textContent = b.ja;
+  document.getElementById('card-en').style.display = showingJa ? 'none' : 'block';
+  document.getElementById('card-ja').style.display = showingJa ? 'block' : 'none';
+  document.getElementById('card-progress').textContent = `${idx+1} / ${blocks.length}`;
+  document.getElementById('progress-fill').style.width = ((idx+1)/blocks.length*100)+'%';
+  document.getElementById('card-state').textContent = showingJa ? '📖 和訳' : '🔤 英文';
+  document.getElementById('btn-prev').disabled = (idx === 0 && !showingJa);
+  const isLast = idx === blocks.length - 1;
+  const btn = document.getElementById('btn-next');
+  if(isLast && showingJa){ btn.textContent = '最初から'; }
+  else if(showingJa){ btn.textContent = '次の英文 →'; }
+  else { btn.textContent = '和訳を見る →'; }
+}
+
+function cardNext(){
+  const isLast = idx === blocks.length - 1;
+  if(!showingJa){ showingJa = true; }
+  else if(isLast){ idx = 0; showingJa = false; }
+  else { idx++; showingJa = false; }
+  renderCard();
+}
+
+function cardNav(dir){
+  if(showingJa){ showingJa = false; }
+  else { idx = Math.max(0, idx + dir); showingJa = false; }
+  renderCard();
+}
+
+function doShuffle(){
+  blocks = shuffle(ALL_BLOCKS);
+  idx = 0; showingJa = false;
+  renderCard();
+}
+// ── startApp (top screen → card screen) ──
+function startApp(){
+  document.getElementById('top-screen').style.display = 'none';
+  document.getElementById('app-screen').style.display = 'block';
+  renderCard();
+}
+
+// ── Popup ──
+const popup = document.getElementById('popup');
+let pTimeout = null;
+document.addEventListener('mouseover', e => {
+  const el = e.target.closest('.tw'); if(!el) return;
+  clearTimeout(pTimeout); showPopup(el.dataset.word, el);
+});
+document.addEventListener('mouseout', e => {
+  const el = e.target.closest('.tw'); if(!el) return;
+  pTimeout = setTimeout(()=>popup.classList.remove('show'), 150);
+});
+popup.addEventListener('mouseenter', ()=>clearTimeout(pTimeout));
+popup.addEventListener('mouseleave', ()=>popup.classList.remove('show'));
+document.addEventListener('click', e => {
+  const el = e.target.closest('.tw');
+  if(!el){ popup.classList.remove('show'); return; }
+  showPopup(el.dataset.word, el); e.stopPropagation();
+});
+document.addEventListener('keydown', e => {
+  if(e.key==='ArrowRight'||e.key==='ArrowDown') cardNext();
+  if(e.key==='ArrowLeft' ||e.key==='ArrowUp')   cardNav(-1);
+});
+
+function showPopup(word, anchor){
+  const v = VOCAB.find(x=>x.w.toLowerCase()===word.toLowerCase());
+  const s500 = !v ? ALL_BLOCKS.find(b=>b.target&&b.target.toLowerCase()===word.toLowerCase()) : null;
+  if(!v && !s500) return;
+  if(v){
+    document.getElementById('pp-word').textContent = v.w;
+    document.getElementById('pp-num').textContent = `でる度A — #${v.n}`;
+    document.getElementById('pp-jp').textContent = v.jp;
+    const rows = v.src.map(s=>`<div class="pp-enc-row"><span class="pp-enc-badge">${s}</span></div>`).join('');
+    document.getElementById('pp-enc').innerHTML = `<div class="pp-enc-label">出現箇所 (${v.src.length})</div>${rows}`;
+  } else {
+    const n = parseInt(s500.label.replace('でる度A #',''));
+    document.getElementById('pp-word').textContent = word;
+    document.getElementById('pp-num').textContent = `でる度A — #${n}`;
+    document.getElementById('pp-jp').textContent = s500.jp || '';
+    document.getElementById('pp-enc').innerHTML = '<div class="pp-enc-label">でる度A 例文カード</div>';
+  }
+  popup.classList.add('show');
+  const rect = anchor.getBoundingClientRect();
+  let top = rect.bottom + window.scrollY + 6;
+  let left = rect.left + window.scrollX;
+  if(left+300>window.innerWidth-16) left=window.innerWidth-316;
+  if(left<8) left=8;
+  if(rect.bottom+200>window.innerHeight) top=rect.top+window.scrollY-215;
+  popup.style.left=left+'px'; popup.style.top=top+'px';
+}
+</script>
+</div>
+</body>
+</html>
